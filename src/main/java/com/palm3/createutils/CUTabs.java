@@ -11,13 +11,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class CUTabs {
     public static final DeferredRegister<CreativeModeTab> CU_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CUMain.MOD_ID);
 
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB = CU_TABS.register(
-            "main_creative_tab",
-            () -> CreativeModeTab.builder()
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB = CU_TABS
+            .register("main_creative_tab", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.createutils.main_creative_tab"))
                     .icon(() -> new ItemStack(Items.IRON_BLOCK.asItem()))
                     .displayItems((params, output) -> {
-                        //items
+                        CUBlocks.SMARTER_OBSERVER.asItem();
+                        Items.STICK.asItem();
                     })
-                    .build());
+                    .build()
+            );
 }
