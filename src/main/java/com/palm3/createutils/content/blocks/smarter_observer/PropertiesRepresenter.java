@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/* This class is used to represent the properties and the properties values of an observed block */
 public class PropertiesRepresenter {
     public static final String DONT_DETECT = "internal_detect_disabled";
     public static final String CANT_DETECT = "internal_cannot_detect";
@@ -17,21 +18,10 @@ public class PropertiesRepresenter {
     private final LinkedHashMap<Property<?>, Integer> propertiesNumbersByProperty = new LinkedHashMap<>();
     private final Integer totalPropertiesNumber;
 
-    //private final LinkedHashMap<Property<?>, LinkedHashMap<Integer, List<String>>> valuesByProperty = new LinkedHashMap<>();
     private final LinkedHashMap<Property<?>, LinkedHashMap<Integer, String>> valuesNumberedByProperty = new LinkedHashMap<>();
     private final LinkedHashMap<Property<?>, LinkedHashMap<String, Integer>> valuesNumbersByStringByProperty = new LinkedHashMap<>();
 
     private final boolean hasProps;
-
-    private final boolean doLog;
-    private void l(String msg) {
-        if (doLog) {
-            if (msg.equals("empty")) {
-                CUMain.LOGGER.info("|");
-                CUMain.LOGGER.info("|");
-            } else CUMain.LOGGER.info(msg);
-        }
-    }
 
     public PropertiesRepresenter(Collection<Property<?>> targetBlockProperties, boolean logEvenMyAAAAH) {
         doLog = logEvenMyAAAAH;
@@ -81,43 +71,96 @@ public class PropertiesRepresenter {
         l("   hasProps | boolean --> " + hasProps);
     }
 
-    // Properties
+    //---------- Properties ----------
     public boolean hasProps() {
         return hasProps;
     }
 
+    /**
+     * @param prop The property as {@link Property}.
+     * @return The requested index, if the property doesn't exist return 0.
+     */
     public Integer getPropIndex(Property<?> prop) {
+        if (prop == null) return 0;
         return propertiesNumbersByProperty.get(prop);
     }
 
-    /// Returns 0 if the property doesn't exist.
+    /**
+     * @param prop The property as {@link String}.
+     * @return The requested index, if the property doesn't exist return 0.
+     */
     public Integer getPropIndex(String prop) {
         if (prop.equals(DONT_DETECT) || prop.equals(CANT_DETECT)) return 0;
         return propertiesNumbersByString.get(prop);
     }
 
+    /**
+     * @param propNumber The number (index) of the property.
+     * @return The requested property as {@link Property}.
+     * @throws IllegalArgumentException If the requested property doesn't exist or isn't found.
+     */
     public Property<?> getProp(Integer propNumber) {
+        if (propertiesAsPropertyNumbered.get(propNumber) == null)
+            throw new IllegalArgumentException("The requested property doesn't exist in {propertiesAsPropertyNumbered}!");
         return propertiesAsPropertyNumbered.get(propNumber);
     }
 
+    /**
+     * @param prop The requested property as {@link String}.
+     * @return The requested proeprty as {@link Property}.
+     * @throws IllegalArgumentException If the requested property doesn't exist or isn't found.
+     */
     public Property<?> getProp(String prop) {
+        if (propertiesNumbersByString.get(prop) == null)
+            throw new IllegalArgumentException("The requested property doesn't exist in {propertiesNumbersByString}!");
+        if (propertiesAsPropertyNumbered.get(propertiesNumbersByString.get(prop)) == null)
+            throw new IllegalArgumentException("The requested property exists, but it's not mapped with its number in {propertiesAsPropertyNumbered}!");
         return propertiesAsPropertyNumbered.get(propertiesNumbersByString.get(prop));
     }
 
+    /**
+     * @param propNumber The number (index) of the property.
+     * @return The requested property as {@link String}.
+     * @throws IllegalArgumentException If the requested property doesn't exist or isn't found.
+     */
     public String getPropString(Integer propNumber) {
+        if (propertiesAsStringNumbered.get(propNumber) == null)
+            throw new IllegalArgumentException("The requested property doesn't exist in {propertiesAsStringNumbered}!");
         return propertiesAsStringNumbered.get(propNumber);
+    }
+
+    /**
+     * @param prop The property as {@link Property}.
+     * @return The requested property as {@link String}.
+     * @throws IllegalArgumentException If the requested property doesn't exist or isn't found.
+     */
+    public String getPropString(Property<?> prop) {
+        if (propertiesNumbersByProperty.get(prop) == null)
+            throw new IllegalArgumentException("The requested property doesn't exist in {propertiesNumbersByProperty}!");
+        if (propertiesAsStringNumbered.get(propertiesNumbersByProperty.get(prop)) == null)
+            throw new IllegalArgumentException("The requested property exists, but it's not mapped with its number in {propertiesAsStringNumbered}!");
+        return propertiesAsStringNumbered.get(propertiesNumbersByProperty.get(prop));
     }
 
     public Integer getPropsNumber() {
         return totalPropertiesNumber;
     }
 
-    // Properties values
+    //---------- Properties values ----------
+    /**
+     * @param property The property to analyze as {@link Property}.
+     * @return The number of values that the property has.
+     * @throws IllegalArgumentException If the given property doesn't exist.
+     */
     public Integer getValuesNumber(Property<?> property) {
+        if (valuesNumberedByProperty.get(property) == null)
+            throw new IllegalArgumentException("The given property doesn't exist!");
         return valuesNumberedByProperty.get(property).size();
     }
 
     public Integer getValuesNumber(String property) {
+        if (valuesNumberedByProperty.get(getProp(property)) == null)
+            throw new IllegalArgumentException("The given property doesn't exist!");
         return valuesNumberedByProperty.get(getProp(property)).size();
     }
 
@@ -127,5 +170,26 @@ public class PropertiesRepresenter {
 
     public Integer getValueIndex(Property<?> prop, String value) {
         return valuesNumbersByStringByProperty.get(prop).get(value);
+    }
+
+    public Property<?> getPropFromValue(String value) {
+
+    }
+
+
+
+
+
+
+
+
+    private final boolean doLog;
+    private void l(String msg) {
+        if (doLog) {
+            if (msg.equals("empty")) {
+                CUMain.LOGGER.info("|");
+                CUMain.LOGGER.info("|");
+            } else CUMain.LOGGER.info(msg);
+        }
     }
 }
