@@ -3,6 +3,7 @@ package com.palm3.createutils.content.blocks.smarter_observer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.palm3.createutils.CUMain;
 import com.palm3.createutils.config.CUCommonConfig;
+import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.*;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
@@ -31,13 +32,19 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
-    // Targets
+    // Filtering targets
     public Block targetBlock;  // Set by the filter, not in the screen
     private static final String targetBlock_Tag = "target_block";
-    public String targetProperty = SelectionRepresenter.NOT_NULL_null;
+    public String targetProperty = SOSettingsRepresenter.NOT_NULL_STILL_NULL;
     private static final String targetProperty_Tag = "target_property";
-    public String targetValue = SelectionRepresenter.NOT_NULL_null;
+    public String targetValue = SOSettingsRepresenter.NOT_NULL_STILL_NULL;
     private static final String targetValue_Tag = "target_prop_value";
+
+    // Behaviour settings
+    public String detectBehaviour = DetectBehaviourRepresenter.DETECT_BOTH;  // Used by screen to know (when block placed for the first time) what to put in button icon.
+    private static final String detectBehaviourTag = "detect_behaviour";
+    public Integer onForTicks = 2;  // Should be 1 redstone tick, i think? Used by screen to know (when block placed for the first time) what to put in scroll input.
+    private static final String onForTicksTag = "on_for_ticks";
 
     // Block Filter
     private FilteringBehaviour filteringBehaviour;
@@ -74,6 +81,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         filteringBehaviour.showCountWhen(() -> false);
         filteringBehaviour.withCallback(is -> {
             targetBlock = Block.byItem(is.getItem());
+            // Initialization of vars for the screen, needed to set the scroll values at first startup.
             if (getTargetBlockProps().isEmpty()) {  // No props and thus values.
                 targetProperty = SelectionRepresenter.CANT_DETECT;
                 targetValue = SelectionRepresenter.CANT_DETECT;
@@ -93,6 +101,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         tag.putString(targetBlock_Tag, blockToString(targetBlock));
         tag.putString(targetProperty_Tag, targetProperty);
         tag.putString(targetValue_Tag, targetValue);
+        tag.putString(detectBehaviourTag, detectBehaviour);
+        tag.putInt(onForTicksTag, onForTicks);
     }
 
     @Override
@@ -101,6 +111,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         this.targetBlock = stringToBlock(tag.getString(targetBlock_Tag));
         this.targetProperty = tag.getString(targetProperty_Tag);
         this.targetValue = tag.getString(targetValue_Tag);
+        this.detectBehaviour = tag.getString(detectBehaviourTag);
+        this.onForTicks = tag.getInt(onForTicksTag);
     }
 
     protected Collection<Property<?>> getTargetBlockProps() {

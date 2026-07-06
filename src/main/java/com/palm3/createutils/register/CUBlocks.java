@@ -1,4 +1,4 @@
-package com.palm3.createutils;
+package com.palm3.createutils.register;
 
 import com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock;
 import com.tterrag.registrate.util.entry.BlockEntry;

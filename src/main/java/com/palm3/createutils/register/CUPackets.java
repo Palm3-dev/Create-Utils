@@ -1,5 +1,6 @@
-package com.palm3.createutils;
+package com.palm3.createutils.register;
 
+import com.palm3.createutils.CUMain;
 import com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverPacket;
 import net.createmod.catnip.net.base.BasePacketPayload;
 import net.createmod.catnip.net.base.CatnipPacketRegistry;

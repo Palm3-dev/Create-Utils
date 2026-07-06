@@ -9,7 +9,13 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 public enum CUGuiTextures implements ScreenElement, TextureSheetSegment {
 
-    SMARTER_OBSERVER_BACKGROUND("smarter_observer_background", 182, 103);
+    // Icons
+    BLOCK_PLACED_I("icons", 0, 0, 16, 16),
+    BLOCK_REMOVED_I("icons", 16, 0, 16, 16),
+    BLOCK_PLACED_REMOVED_I("icons", 32, 0, 16, 16),
+
+    // Backgrounds
+    SMARTER_OBSERVER_BACKGROUND("smarter_observer_background", 182, 129);
 
 
     public static final int FONT_COLOR = 0x575F7A;

@@ -1,10 +1,13 @@
 package com.palm3.createutils.content.blocks.smarter_observer;
 
 import com.mojang.serialization.MapCodec;
-import com.palm3.createutils.CUBlockEntities;
+import com.palm3.createutils.CUMain;
+import com.palm3.createutils.register.CUBlockEntities;
 import com.simibubi.create.foundation.block.IBE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -107,69 +110,6 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
         return CUBlockEntities.SMARTER_OBSERVER_BE.get();
     }
 
-    /* *
-     * Detect properties of the block in front of the facing direction (if facing north, the block north of this block)
-     * and saves them in the HashMap present at the currentBlockPos block entity, that should be instanceof {@link SmarterObserverBlockEntity},
-     * by also clearing it before saving the new properties.
-     * @param currentBlockState The blockstate of the current block, used to know current facing direction.
-     * @param currentBlockPos The position of the current block, to get the {@link BlockEntity} at that pos.
-     * @param currentLevel The current level.
-     * @param printLogs If logs should be printed.
-     * /
-    protected static void detectBlockProps(BlockState currentBlockState, BlockPos currentBlockPos, LevelAccessor currentLevel, HashMap<Integer, Property<?>> map, boolean printLogs) {
-        //if (!currentLevel.isClientSide() && currentLevel.getBlockEntity(currentBlockPos) instanceof SmarterObserverBlockEntity sobe) {
-        map.clear();
-
-        // Calculate the observed block pos based on facing direction.
-        BlockPos observedBlockPos = switch (currentBlockState.getValue(FACING)) {
-            case UP -> currentBlockPos.above();
-            case DOWN -> currentBlockPos.below();
-            case NORTH -> currentBlockPos.north();
-            case SOUTH -> currentBlockPos.south();
-            case EAST -> currentBlockPos.east();
-            case WEST -> currentBlockPos.west();
-        };
-
-        BlockState observedBlockState = currentLevel.getBlockState(observedBlockPos);
-
-        // Save observed Block
-        //sobe. = observedBlockState.getBlock();
-
-        // Add properties to given HashMap
-        int mapStateIndex = 0;
-        for (Property<?> p : observedBlockState.getProperties()) {
-            map.put(mapStateIndex, p);
-            mapStateIndex++;
-        }
-
-        // Maybe print obtained properties and all their possible values
-        if (printLogs) {
-            CUMain.LOGGER.info("List of all [{}] blockstate properties:", BuiltInRegistries.BLOCK.getKey(observedBlockState.getBlock()));
-            map.forEach((i, p) -> {
-                CUMain.LOGGER.info("- Property '{}', saved at HashMap index {}", p.getName(), i);
-                CUMain.LOGGER.info("    Possible values of property '{}': ", p.getName());
-                p.getPossibleValues().forEach(value -> CUMain.LOGGER.info("      {}", value.toString()));
-            });
-        }
-
-            /*
-            // Update block entity
-            sobe.setChanged();
-        } else {
-            String levelType = currentLevel.isClientSide() ? "CLIENT." : "SERVER.";
-            String beType = currentLevel.getBlockEntity(currentBlockPos) instanceof SmarterObserverBlockEntity
-                    ? " BlockEntity at " + currentBlockPos + " IS instanceof SmarterObserverBlockEntity"
-                    : " BlockEntity at " + currentBlockPos + " IS NOT instanceof SmarterObserverBlockEntity";
-            throw new IllegalArgumentException("Level type: " + levelType + beType);
-        }* /
-    }
-
-    private static HashMap<Integer, Property<?>> detectBlockPropsAsMap(BlockState currentBlockState, BlockPos currentBlockPos, LevelAccessor currentLevel, boolean printLogs) {
-        HashMap<Integer, Property<?>> map = new HashMap<>();
-        detectBlockProps(currentBlockState, currentBlockPos, currentLevel, map, printLogs);
-        return map;
-    }*/
-
     @Override
     public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
@@ -178,48 +118,23 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
     }
 
 
-
-
-
+    // Behaviour
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
     }
 
-
-
-    /*
-    private static boolean observedBlockChanged(LevelAccessor level, BlockPos pos) {
-        return level.getBlockState(pos).getBlock() != observedBlock;
-    }
-
-    private static boolean observedPropsChanged(BlockState currentBlockState, BlockPos currentBlockPos, LevelAccessor level) {
-        return !detectBlockPropsAsMap(currentBlockState, currentBlockPos, level, false).equals(observedBlockProperties);
-    }*/
-
-
-
-
     @Override
     protected @NotNull BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
-       /* if (!level.isClientSide()) {
-            if (observedBlockChanged(level, facingPos)) {
-                CUMain.LOGGER.info("BLOCK HAS CHANGED!");
-                CUMain.LOGGER.info("Updating observedBlockProperties");
-                detectBlockProps(state, currentPos, level, observedBlockProperties, CUCommonConfig.LOG_ALL.getAsBoolean());
-            } else if (observedPropsChanged(state, currentPos, level)) { // confronitng props, not props values todo fix ts
-                CUMain.LOGGER.info("BLOCK property(es) HAS CHANGED!");
-                //fire event things
-            } else if (observedBlockChanged(level, facingPos) && observedPropsChanged(state, currentPos, level)) {
-                CUMain.LOGGER.info("props and block changed");
-                CUMain.LOGGER.info("Updating observedBlockProperties");
-                detectBlockProps(state, currentPos, level, observedBlockProperties, CUCommonConfig.LOG_ALL.getAsBoolean());
-            }
-            CUMain.LOGGER.info("");
-        }*/
+        if (state.getValue(FACING) == facing) {
+            CUMain.LOGGER.info("THE CHANGE WAS IN FACING DIR.");
+        }
 
         return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
     }
 
-
+    @Override
+    protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        //
+    }
 }
