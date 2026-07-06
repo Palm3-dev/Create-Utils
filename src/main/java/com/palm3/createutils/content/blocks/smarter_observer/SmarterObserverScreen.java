@@ -28,13 +28,13 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     // Current values (when screen opened).
     private final String currentTargetProperty;
     private final String currentTargetValue;
-    private final String currentDetectBehaviour;
+    private final String currentDetectMode;
     private final Integer currentOnForTicks;
 
     // Final values.
     private String selectedTargetProperty;
     private String selectedTargetValue;
-    private String selectedDetectBehaviour;
+    private String selectedDetectMode;
     private Integer selectedOnForTicks;
 
     // To get all the properties/values.
@@ -46,7 +46,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     private ScrollInput onForTicksSetter;
 
     // Textures - buttons - others
-    private IconButton detectBehaviourSetter;
+    private IconButton detectModeSetter;
     private IconButton confirmButton;
     private CUGuiTextures background;
     private ItemStack smarterObserver;
@@ -65,13 +65,13 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         // Save current BE settings, uses those for the logic. Are set to CANT/DONT_DETECT when you set the block filter.
         currentTargetProperty = sobe.targetProperty;
         currentTargetValue = sobe.targetValue;
-        currentDetectBehaviour = sobe.detectBehaviour;
+        currentDetectMode = sobe.detectMode;
         currentOnForTicks = sobe.onForTicks;
 
         // Safe, if nothing touched they need to be the same. Also needed for renderWindow().
         selectedTargetProperty = currentTargetProperty;
         selectedTargetValue = currentTargetValue;
-        selectedDetectBehaviour = sobe.detectBehaviour;
+        selectedDetectMode = sobe.detectMode;
         selectedOnForTicks = currentOnForTicks;
 
         sr = new SelectionRepresenter(sobe.getTargetBlockProps());
@@ -126,12 +126,12 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                 })
                 .setState(currentOnForTicks);  // Startup only
 
-        detectBehaviourSetter = new IconButton(x + 120, y + 105, DetectBehaviourRepresenter.getIcon(currentDetectBehaviour));
-        detectBehaviourSetter.setToolTip(DetectBehaviourRepresenter.getTooltip(currentDetectBehaviour));
-        detectBehaviourSetter.withCallback(() -> {
-            selectedDetectBehaviour = DetectBehaviourRepresenter.getNext(selectedDetectBehaviour);
-            detectBehaviourSetter.setIcon(DetectBehaviourRepresenter.getIcon(selectedDetectBehaviour));
-            detectBehaviourSetter.setToolTip(DetectBehaviourRepresenter.getTooltip(selectedDetectBehaviour));
+        detectModeSetter = new IconButton(x + 120, y + 105, DetectModeRepresenter.getIcon(currentDetectMode));
+        detectModeSetter.setToolTip(DetectModeRepresenter.getTooltip(currentDetectMode));
+        detectModeSetter.withCallback(() -> {
+            selectedDetectMode = DetectModeRepresenter.getNext(selectedDetectMode);
+            detectModeSetter.setIcon(DetectModeRepresenter.getIcon(selectedDetectMode));
+            detectModeSetter.setToolTip(DetectModeRepresenter.getTooltip(selectedDetectMode));
         });
 
         confirmButton = new IconButton(x + 149, y + 105, AllIcons.I_CONFIRM);
@@ -140,7 +140,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         addRenderableWidget(targetPropertySetter);
         addRenderableWidget(targetValueSetter);
         addRenderableWidget(onForTicksSetter);
-        addRenderableWidget(detectBehaviourSetter);
+        addRenderableWidget(detectModeSetter);
         addRenderableWidget(confirmButton);
     }
 
@@ -152,14 +152,14 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
             CUMain.LOGGER.info(" - Block: {}", sobe.targetBlock);
             CUMain.LOGGER.info(" - Property: {}", selectedTargetProperty);
             CUMain.LOGGER.info(" - Prop. value: {}", selectedTargetValue);
-            CUMain.LOGGER.info(" - Detect behaviour: {}", selectedDetectBehaviour);
+            CUMain.LOGGER.info(" - Detect behaviour: {}", selectedDetectMode);
             CUMain.LOGGER.info(" - On for ticks: {}", selectedOnForTicks);
         }
         CatnipServices.NETWORK.sendToServer(new SmarterObserverPacket(
                 sobe.getBlockPos(),
                 selectedTargetProperty,
                 selectedTargetValue,
-                selectedDetectBehaviour,
+                selectedDetectMode,
                 selectedOnForTicks
         ));
     }

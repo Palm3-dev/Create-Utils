@@ -135,7 +135,7 @@ public class SOSettingsRepresenter {
         }
     }
 
-    protected static class DetectBehaviourRepresenter {
+    protected static class DetectModeRepresenter {
         public static final String DETECT_PLACED = "detect_placed";
         public static final String DETECT_REMOVED = "detect_removed";
         public static final String DETECT_BOTH = "detect_both";

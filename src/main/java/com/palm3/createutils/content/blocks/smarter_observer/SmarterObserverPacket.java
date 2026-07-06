@@ -13,21 +13,21 @@ public class SmarterObserverPacket extends BlockEntityConfigurationPacket<Smarte
             BlockPos.STREAM_CODEC, packet -> packet.pos,
             ByteBufCodecs.STRING_UTF8, packet -> packet.targetProperty,
             ByteBufCodecs.STRING_UTF8, packet -> packet.targetValue,
-            ByteBufCodecs.STRING_UTF8, packet -> packet.detectBehaviour,
+            ByteBufCodecs.STRING_UTF8, packet -> packet.detectMode,
             ByteBufCodecs.INT, packet -> packet.onForTicks,
             SmarterObserverPacket::new
     );
 
     private final String targetProperty;
     private final String targetValue;
-    private final String detectBehaviour;
+    private final String detectMode;
     private final Integer onForTicks;
 
-    public SmarterObserverPacket(BlockPos pos, String targetProperty, String targetValue, String detectBehaviour, Integer onForTicks) {
+    public SmarterObserverPacket(BlockPos pos, String targetProperty, String targetValue, String detectMode, Integer onForTicks) {
         super(pos);
         this.targetProperty = targetProperty;
         this.targetValue = targetValue;
-        this.detectBehaviour = detectBehaviour;
+        this.detectMode = detectMode;
         this.onForTicks = onForTicks;
     }
 
@@ -36,7 +36,7 @@ public class SmarterObserverPacket extends BlockEntityConfigurationPacket<Smarte
     protected void applySettings(ServerPlayer player, SmarterObserverBlockEntity sobe) {
         sobe.targetProperty = targetProperty;
         sobe.targetValue = targetValue;
-        sobe.detectBehaviour = detectBehaviour;
+        sobe.detectMode = detectMode;
         sobe.onForTicks = onForTicks;
         sobe.setChanged();
     }

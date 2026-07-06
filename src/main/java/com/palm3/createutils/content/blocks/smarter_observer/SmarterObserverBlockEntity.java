@@ -41,8 +41,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     private static final String targetValue_Tag = "target_prop_value";
 
     // Behaviour settings
-    public String detectBehaviour = DetectBehaviourRepresenter.DETECT_BOTH;  // Used by screen to know (when block placed for the first time) what to put in button icon.
-    private static final String detectBehaviourTag = "detect_behaviour";
+    public String detectMode = DetectModeRepresenter.DETECT_BOTH;  // Used by screen to know (when block placed for the first time) what to put in button icon.
+    private static final String detectModeTag = "detect_mode";
     public Integer onForTicks = 2;  // Should be 1 redstone tick, i think? Used by screen to know (when block placed for the first time) what to put in scroll input.
     private static final String onForTicksTag = "on_for_ticks";
 
@@ -101,7 +101,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         tag.putString(targetBlock_Tag, blockToString(targetBlock));
         tag.putString(targetProperty_Tag, targetProperty);
         tag.putString(targetValue_Tag, targetValue);
-        tag.putString(detectBehaviourTag, detectBehaviour);
+        tag.putString(detectModeTag, detectMode);
         tag.putInt(onForTicksTag, onForTicks);
     }
 
@@ -111,7 +111,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         this.targetBlock = stringToBlock(tag.getString(targetBlock_Tag));
         this.targetProperty = tag.getString(targetProperty_Tag);
         this.targetValue = tag.getString(targetValue_Tag);
-        this.detectBehaviour = tag.getString(detectBehaviourTag);
+        this.detectMode = tag.getString(detectModeTag);
         this.onForTicks = tag.getInt(onForTicksTag);
     }
 
