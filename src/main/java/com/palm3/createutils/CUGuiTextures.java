@@ -8,10 +8,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 public enum CUGuiTextures implements ScreenElement, TextureSheetSegment {
-    // Icons
-        //nothing here for now
 
-    // Accelerator motor
     SMARTER_OBSERVER_BACKGROUND("smarter_observer_background", 182, 103);
 
 

@@ -11,25 +11,25 @@ import net.minecraft.server.level.ServerPlayer;
 public class SmarterObserverPacket extends BlockEntityConfigurationPacket<SmarterObserverBlockEntity> {
     public static final StreamCodec<ByteBuf, SmarterObserverPacket> STREAM_CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, packet -> packet.pos,
-            ByteBufCodecs.STRING_UTF8, packet -> packet.targetBlockPropertyName,
-            ByteBufCodecs.STRING_UTF8, packet -> packet.targetBlockPropertyValue,
+            ByteBufCodecs.STRING_UTF8, packet -> packet.targetProperty,
+            ByteBufCodecs.STRING_UTF8, packet -> packet.targetValue,
             SmarterObserverPacket::new
     );
 
-    private final String targetBlockPropertyName;
-    private final String targetBlockPropertyValue;
+    private final String targetProperty;
+    private final String targetValue;
 
-    public SmarterObserverPacket(BlockPos pos, String targetBlockPropertyName, String targetBlockPropertyValue) {
+    public SmarterObserverPacket(BlockPos pos, String targetProperty, String targetValue) {
         super(pos);
-        this.targetBlockPropertyName = targetBlockPropertyName;
-        this.targetBlockPropertyValue = targetBlockPropertyValue;
+        this.targetProperty = targetProperty;
+        this.targetValue = targetValue;
     }
 
     // Applies received settings on server
     @Override
     protected void applySettings(ServerPlayer player, SmarterObserverBlockEntity sobe) {
-        sobe.targetProperty = targetBlockPropertyName;
-        sobe.targetValue = targetBlockPropertyValue;
+        sobe.targetProperty = targetProperty;
+        sobe.targetValue = targetValue;
         sobe.setChanged();
     }
 

@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
@@ -27,18 +28,15 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 import java.util.List;
 
-/*
-* This block entity saves all the infos of the TARGET BLOCK only.
-*/
 @ParametersAreNonnullByDefault
 public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
     // Targets
     public Block targetBlock;  // Set by the filter, not in the screen
     private static final String targetBlock_Tag = "target_block";
-    public String targetProperty = PropertiesRepresenter.DONT_DETECT;
+    public String targetProperty = SelectionRepresenter.NOT_NULL_null;
     private static final String targetProperty_Tag = "target_property";
-    public String targetValue = PropertiesRepresenter.DONT_DETECT;
+    public String targetValue = SelectionRepresenter.NOT_NULL_null;
     private static final String targetValue_Tag = "target_prop_value";
 
     // Block Filter
@@ -71,10 +69,18 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
             }
         });
+        filteringBehaviour.setLabel(Component.translatable("smarter_observer_be.target_block"));
         filteringBehaviour.setFilter(new ItemStack(Blocks.AIR.asItem()));
         filteringBehaviour.showCountWhen(() -> false);
         filteringBehaviour.withCallback(is -> {
             targetBlock = Block.byItem(is.getItem());
+            if (getTargetBlockProps().isEmpty()) {  // No props and thus values.
+                targetProperty = SelectionRepresenter.CANT_DETECT;
+                targetValue = SelectionRepresenter.CANT_DETECT;
+            } else {
+                targetProperty = SelectionRepresenter.DONT_DETECT;
+                targetValue = SelectionRepresenter.DONT_DETECT;
+            }
             if (CUCommonConfig.LOG_ALL.getAsBoolean()) CUMain.LOGGER.info("Selected filter: {}", Block.byItem(is.getItem()));
             this.setChanged();
         });
@@ -99,10 +105,6 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
     protected Collection<Property<?>> getTargetBlockProps() {
         return targetBlock.getStateDefinition().getProperties();
-    }
-
-    protected boolean targetBlockHasProps() {
-        return !getTargetBlockProps().isEmpty();
     }
 
 

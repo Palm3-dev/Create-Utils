@@ -3,11 +3,8 @@ package com.palm3.createutils.content.blocks.smarter_observer;
 import com.mojang.serialization.MapCodec;
 import com.palm3.createutils.CUBlockEntities;
 import com.simibubi.create.foundation.block.IBE;
-import net.createmod.catnip.gui.ScreenOpener;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -176,7 +173,7 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
     @Override
     public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        withBlockEntityDo(level, pos, be -> SmarterObserverScreen.tryOpenScreen(be, level));
+        withBlockEntityDo(level, pos, be -> SmarterObserverScreen.openScreen(be, level));
         return InteractionResult.CONSUME;
     }
 

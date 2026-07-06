@@ -8,6 +8,7 @@ import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
 import net.createmod.catnip.gui.AbstractSimiScreen;
 import net.createmod.catnip.gui.ScreenOpener;
+import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -17,71 +18,19 @@ import net.minecraft.world.level.block.Blocks;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static com.palm3.createutils.CUMain.l;
-import static com.palm3.createutils.content.blocks.smarter_observer.PropertiesRepresenter.CANT_DETECT;
-import static com.palm3.createutils.content.blocks.smarter_observer.PropertiesRepresenter.DONT_DETECT;
-
 @ParametersAreNonnullByDefault
 public class SmarterObserverScreen extends AbstractSimiScreen {
 
+    // Current target values (when screen opened).
+    private final String currentTargetProperty;
+    private final String currentTargetValue;
 
+    // Final target values.
+    private String selectedTargetProperty;
+    private String selectedTargetValue;
 
-
-
-
-
-
-
-
-
-
-
-
-    protected static void tryOpenScreen(SmarterObserverBlockEntity sobe, Level level) {
-        if (sobe.targetBlock != null & sobe.targetBlock != Blocks.AIR) ScreenOpener.open(new SmarterObserverScreen(sobe));
-        else if (level.isClientSide) level.playSound(null, sobe.getBlockPos(), SoundEvents.NOTE_BLOCK_DIDGERIDOO.value(), SoundSource.BLOCKS, 1.0f, 0.90f);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-    ///  Starts from 0, contains the PROPERTIES.
-    private final LinkedHashMap<Integer, Property<?>> targetProps = new LinkedHashMap<>();
-    // Map with all the target propValues, arranged by number.
-
-    private final LinkedHashMap<String, Integer> targetPropsString = new LinkedHashMap<>();
-    // USed only for the scroll value to set the state based on the property
-
-    private final int propertiesAmount;  // The number of propValues the target block has.
-
-    /// Contains the {@link List}s of VALUES, accessed via the respective {@link Property}.
-    private final LinkedHashMap<Property<?>, List<String>> targetValuesPerProp = new LinkedHashMap<>();
-    // Map with a List of all the possible property values (as string) for each Property.
-
-    /// Contains the VALUES AMOUNTS accessible via the respective {@link Property}.
-    private final LinkedHashMap<Property<?>, Integer> valuesAmountPerProp = new LinkedHashMap<>();
-    // Map with the values number for each Property.*/
-
-
-
-
-    private final PropertiesRepresenter propValues;
-
-
-
-    // Selected things to detect
-    //private @Nullable Property<?> targetPropertyProp;  // The selected property as Property<type>
-    //private String targetPropertyString = DONT_DETECT;  // The selected property as String (send this to BE), default detecting is disabled.
-    //private String targetValueString = DONT_DETECT;  // The selected value as String (send this to BE).
+    // To get all the properties/values.
+    private final SelectionRepresenter sr;
 
     // ScrollInput
     private ScrollInput targetValueSetter;  // ScrollInput to choose the property value to detect.
@@ -91,59 +40,22 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     private IconButton confirmButton;
     private CUGuiTextures background;
 
-    private SmarterObserverBlockEntity sobe;  // The BE to save the values in.
+    private final SmarterObserverBlockEntity sobe;  // The BE to save the values in.
 
     public SmarterObserverScreen(SmarterObserverBlockEntity sobe) {
         super(Component.translatable("gui.smarter_observer.title"));
         background = CUGuiTextures.SMARTER_OBSERVER_BACKGROUND;
         this.sobe = sobe;
 
+        // Save current BE settings, uses those for the logic.
+        currentTargetProperty = sobe.targetProperty;
+        currentTargetValue = sobe.targetValue;
 
+        // Safe, if nothing touched they need to be the same. Also needed for renderWindow().
+        selectedTargetProperty = currentTargetProperty;
+        selectedTargetValue = currentTargetValue;
 
-        propValues = new PropertiesRepresenter(sobe.getTargetBlockProps(), CUCommonConfig.LOG_ALL.getAsBoolean());
-        if (propValues.hasProps()) {
-            sobe.targetProperty = propValues.getPropString(0);
-            sobe.targetValue = propValues.getValueString(propValues.getProp(0), 0);
-        } else {
-            sobe.targetProperty = CANT_DETECT;
-            sobe.targetValue = CANT_DETECT;
-        }
-
-
-
-
-        /*
-
-        // Set up all maps.
-        int i = 0;
-        for (Property<?> prop : sobe.getTargetBlockProps()) {
-            // Add propValues to propValues map.
-            targetProps.put(i, prop);
-            targetPropsString.put(prop.getName(), prop);
-
-            // Add list of values for each property.
-            List<String> propValues = new ArrayList<>();
-            prop.getPossibleValues().forEach(value -> propValues.add(value.toString()));
-            targetValuesPerProp.put(prop, propValues);
-            i++;
-        }
-
-        // Set propValues amount.
-        propertiesAmount = targetProps.size();
-
-        // Adds the number of values for each property.
-        targetValuesPerProp.forEach((prop, values) -> valuesAmountPerProp.put(prop, values.size()));
-
-        // Logging
-        if (CUCommonConfig.LOG_ALL.getAsBoolean()) {
-            CUMain.LOGGER.info("Selected block propValues: ");
-            if (!sobe.targetBlockHasProps()) CUMain.LOGGER.info("null, block doesn't have propValues.");
-            targetValuesPerProp.forEach((prop, propValues) -> {
-                CUMain.LOGGER.info(" {}", prop.getName());
-                CUMain.LOGGER.info("    values:");
-                propValues.forEach(value -> CUMain.LOGGER.info("      {}", value));
-            });
-        }*/
+        sr = new SelectionRepresenter(sobe.getTargetBlockProps());
     }
 
     @Override
@@ -157,66 +69,55 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         int x = guiLeft; // Horizontal
         int y = guiTop;  // Vertical
 
-        l("======== Screen init() ========");
-        l("targetPropertySetter scroll input:");
-        //AtomicInteger targetPropertyState = new AtomicInteger();
-        targetPropertySetter = new ScrollInput(x + 14, y + 23, 59, 16)
-                .withRange(0, propValues.getPropsNumber())
+
+        targetPropertySetter = new ScrollInput(x + 17, y + 23, 137, 16)
+                .withRange(0, sr.getPropsNumber(false))
                 .titled(Component.translatable("gui.smarter_observer.target_property_scroll"))
+                .addHint(Component.translatable("gui.smarter_observer.target_property_hint"))
                 .calling(i -> {
-                    CUMain.LOGGER.info("i = {}", i);
-                    //targetPropertyState.set(i);
-                    if (!propValues.hasProps()) {
-                        sobe.targetProperty = CANT_DETECT;
-                        sobe.targetValue = CANT_DETECT;
-                    } else {
-                        if (i == 0) {  // Don't detect.
-                            sobe.targetProperty = DONT_DETECT;
-                            sobe.targetValue = DONT_DETECT;
-                        } else {
-                            sobe.targetProperty = propValues.getPropString(i - 1);
-                            sobe.targetValue = "shall set";
-                        }
+                    selectedTargetProperty = sr.getProp(i);
+                    // Sets the range based on the current property, otherwise could crash due to the targetValueSetter going to search a value at non-existing indexes.
+                    targetValueSetter.withRange(0, sr.getPValuesNumber(selectedTargetProperty, false));
+                    if (i == 0) {  // Detect disabled.
+                        targetValueSetter.withRange(0, 1);  // If no property, cannot change the value.
+                        targetValueSetter.setState(0);  // If no property to detect, you can't detect a value, am i right?
+                        selectedTargetValue = SelectionRepresenter.DONT_DETECT;  // Set to don't detect, not updated automatically after setState(0).
                     }
                 })
                 .withStepFunction(sc -> 1)
-                .setState(propValues.getPropIndex(sobe.targetProperty));
+                .setState(sr.getPropIndex(currentTargetProperty));  // Startup only
 
-        //int maxValue = targetPropertyProp == null ? 1 : valuesAmountPerProp.get(targetPropertyProp);
-        //AtomicInteger targetValueState = new AtomicInteger();
-        targetValueSetter = new ScrollInput(x + 70, y + 23, 59, 16)
-                .withRange(0, propValues.getValuesNumber(sobe.targetProperty) + 1)
+        targetValueSetter = new ScrollInput(x + 17, y + 49, 137, 16)
+                .withRange(0, sr.getPValuesNumber(currentTargetProperty, false))
                 .titled(Component.translatable("gui.smarter_observer.target_value_scroll"))
-                .calling(i -> {
-                    //targetValueState.set(i);
-
-                    //if (targetPropertyProp == null) CUMain.LOGGER.info("targetPropertyProp is 'null'");
-
-                    if (i == 0) CUMain.LOGGER.info("value is 0");
-                    //else targetValueString = propValues.getValueString(propValues.getProp(sobe.targetProperty), i - 1);
-
-                })
+                .addHint(Component.translatable("gui.smarter_observer.target_value_hint"))
+                .calling(i -> selectedTargetValue = sr.getPValue(selectedTargetProperty, i))
                 .withStepFunction(sc -> 1)
-                .setState(propValues.getValueIndex(propValues.getProp(sobe.targetProperty), sobe.targetValue));
+                .setState(sr.getPValueIndex(selectedTargetProperty, currentTargetValue));  // Startup only
+
 
         confirmButton = new IconButton(x + 149, y + 79, AllIcons.I_CONFIRM);
         confirmButton.withCallback(() -> onClose());
 
         addRenderableWidget(targetPropertySetter);
-        //addRenderableWidget(targetValueSetter);
+        addRenderableWidget(targetValueSetter);
         addRenderableWidget(confirmButton);
     }
 
     @Override
     public void removed() {
-        CUMain.LOGGER.info("Should send packet!");
-        /*CatnipServices.NETWORK.sendToServer(new AcceleratorMotorPacket(
-                blockEntity.getBlockPos(), accelerateToValue.getState(),
-                negativeDirectionValue.getState() == 1,
-                increasedRpmPerTickValue.getState(),
-                increaseEveryValue.getState(),
-                showOnlyTicks
-        ));*/
+        if (CUCommonConfig.LOG_ALL.getAsBoolean()) {
+            CUMain.LOGGER.info("");
+            CUMain.LOGGER.info("Observer filters (prop & value):");
+            CUMain.LOGGER.info(" - Block: {}", sobe.targetBlock);
+            CUMain.LOGGER.info(" - Property: {}", selectedTargetProperty);
+            CUMain.LOGGER.info(" - Prop. value: {}", selectedTargetValue);
+        }
+        CatnipServices.NETWORK.sendToServer(new SmarterObserverPacket(
+                sobe.getBlockPos(),
+                selectedTargetProperty,
+                selectedTargetValue
+        ));
     }
 
     @Override
@@ -230,7 +131,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         graphics.drawString(
                 font,
                 title,
-                x + background.getWidth() / 2 - font.width(title) / 2,
+                x + background.getWidth() / 2 - font.width(title) / 2 - 4,  // Offset cause it seems off center to me.
                 y + 4,
                 0x592424,
                 false
@@ -239,8 +140,8 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         // Current target property
         graphics.drawString(
                 font,
-                Component.literal(sobe.targetProperty == null ? "null" : sobe.targetProperty),
-                x + 20,
+                SelectionRepresenter.checkAndTranslateStatics(selectedTargetProperty),
+                x + 23,
                 y + 27,
                 0xFCFCEB,
                 true
@@ -249,8 +150,8 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         // Current target value
         graphics.drawString(
                 font,
-                Component.literal("ignore"),
-                x + 20,
+                SelectionRepresenter.checkAndTranslateStatics(selectedTargetValue),
+                x + 23,
                 y + 53,
                 0xFCFCEB,
                 true
@@ -260,5 +161,12 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         super.render(graphics, mouseX, mouseY, partialTicks);
+    }
+
+    protected static void openScreen(SmarterObserverBlockEntity sobe, Level level) {
+        if (sobe.targetBlock != null & sobe.targetBlock != Blocks.AIR)
+            ScreenOpener.open(new SmarterObserverScreen(sobe));
+        else if (!level.isClientSide)
+            level.playSound(null, sobe.getBlockPos(), SoundEvents.NOTE_BLOCK_DIDGERIDOO.value(), SoundSource.BLOCKS, 1.0f, 0.90f);
     }
 }
