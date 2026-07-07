@@ -27,7 +27,7 @@ public class CUCommonConfig {
         builder.push("Smarter Observer");
         MAX_ON_FOR_TICKS = builder
                 .comment("The max number of game ticks the observer should remain powered after detecting a block. 1s = 20tick, 1min = 1200tick, 1h = 72000tick")
-                .defineInRange("Max ticks on", 18000, 0, Integer.MAX_VALUE);
+                .defineInRange("Max ticks on", 6000, 1, 72000);
 
         builder.pop();
 

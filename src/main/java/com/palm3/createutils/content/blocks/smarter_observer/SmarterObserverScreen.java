@@ -9,20 +9,14 @@ import com.simibubi.create.foundation.gui.AllIcons;
 import com.simibubi.create.foundation.gui.widget.IconButton;
 import com.simibubi.create.foundation.gui.widget.ScrollInput;
 import net.createmod.catnip.gui.AbstractSimiScreen;
-import net.createmod.catnip.gui.ScreenOpener;
 import net.createmod.catnip.gui.element.GuiGameElement;
 import net.createmod.catnip.platform.CatnipServices;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 public class SmarterObserverScreen extends AbstractSimiScreen {
@@ -49,10 +43,34 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
 
     // Textures - buttons - others
     private IconButton detectModeSetter;
+    private IconButton tickViewModeSetter;
+    private enum TickView {
+        ONLY_TICKS,
+        TICK_SECONDS;
+
+        TickView() {}
+
+        private static TickView getNext(TickView currentTickViewMode) {
+            switch (currentTickViewMode) {
+                case ONLY_TICKS -> { return TICK_SECONDS; }
+                case TICK_SECONDS -> { return ONLY_TICKS; }
+                default -> throw new IllegalArgumentException("Given currentTickViewMode enum value doesn't exist!");
+            }
+        }
+
+        private static CUGuiTextures getIcon(TickView currentTickViewMode) {
+            switch (currentTickViewMode) {
+                case TICK_SECONDS -> { return CUGuiTextures.TICK_SECONDS_I; }
+                case ONLY_TICKS -> { return CUGuiTextures.TICK_I; }
+                default -> throw new IllegalArgumentException("Given currentTickViewMode enum value doesn't exist!");
+            }
+        }
+    }  // To represent tick view mode
+    private TickView tickViewMode = TickView.ONLY_TICKS;
     private IconButton confirmButton;
     private CUGuiTextures background;
-    private ItemStack smarterObserver;
-    private ItemStack targetBlockAsItem;
+    private final ItemStack smarterObserver;
+    private final ItemStack targetBlockAsItem;
 
     private final SmarterObserverBlockEntity sobe;  // The BE to save the values in.
 
@@ -116,17 +134,42 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                 .withStepFunction(sc -> 1)
                 .setState(sr.getPValueIndex(selectedTargetProperty, currentTargetValue));  // Startup only
 
-        onForTicksSetter = new ScrollInput(x + 17, y + 75, 48, 16)
+        onForTicksSetter = new ScrollInput(x + 17, y + 75, 47, 16)
                 .withRange(1, CUCommonConfig.MAX_ON_FOR_TICKS.getAsInt() + 1)
                 .titled(Component.translatable("gui.smarter_observer.on_for_ticks_scroll"))
                 .addHint(Component.translatable("gui.smarter_observer.on_for_ticks_hint"))
                 .calling(i -> selectedOnForTicks = i)
                 .withStepFunction(sc -> {
-                    if (sc.control) return 200;  // 10 seconds
-                    if (sc.shift) return 20;  // 1 second
-                    return 1;  // 1 tick
+                    switch (tickViewMode) {
+                        case TICK_SECONDS -> {
+                            if (selectedOnForTicks >= 20) {
+                                if (sc.control) return 1200;  // 1 minute
+                                if (sc.shift) return 200;  // 10 seconds
+                                return 20;  // 1 second
+                            } else return 1;
+                        }
+
+                        case ONLY_TICKS -> {
+                            if (sc.control) return 200;  // 10 seconds
+                            if (sc.shift) return 20;  // 1 second
+                            return 1;  // 1 tick
+                        }
+
+                        default -> throw new IllegalStateException("Impossible value of enum TickView!");
+                    }
                 })
                 .setState(currentOnForTicks);  // Startup only
+
+        tickViewModeSetter = new IconButton(x + 73, y + 74, TickView.getIcon(tickViewMode));
+        tickViewModeSetter.withCallback(() -> {
+            tickViewMode = TickView.getNext(tickViewMode);
+            tickViewModeSetter.setIcon(TickView.getIcon(tickViewMode));
+            // Adjust ticks value to be the same as the rounded displayed seconds.
+            if (tickViewMode == TickView.TICK_SECONDS && selectedOnForTicks >= 20) {
+                selectedOnForTicks = (int) Math.floor((float) selectedOnForTicks / 20) * 20;
+                onForTicksSetter.setState(selectedOnForTicks);
+            }
+        });
 
         detectModeSetter = new IconButton(x + 120, y + 105, DetectModeRepresenter.getIcon(currentDetectMode));
         detectModeSetter.setToolTip(DetectModeRepresenter.getTooltip(currentDetectMode));
@@ -142,6 +185,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         addRenderableWidget(targetPropertySetter);
         addRenderableWidget(targetValueSetter);
         addRenderableWidget(onForTicksSetter);
+        addRenderableWidget(tickViewModeSetter);
         addRenderableWidget(detectModeSetter);
         addRenderableWidget(confirmButton);
     }
@@ -206,7 +250,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         // Current on for ticks
         graphics.drawString(
                 font,
-                Component.literal(selectedOnForTicks.toString() + "t"),
+                Component.literal(getTickString(selectedOnForTicks)),
                 x + 23,
                 y + 79,
                 0xFCFCEB,
@@ -225,14 +269,27 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         if ((mouseX > x + 13 && mouseX <= x + 29) && (mouseY > y + 106 && mouseY <= y + 122)) {
             graphics.renderTooltip(
                     font,
-                    getTargetBlockTooltip(targetBlockAsItem),
+                    getTargetBlockTooltip(),
                     mouseX, mouseY
             );
         }
     }
 
-    private Component getTargetBlockTooltip(ItemStack targetBlockAsItem) {
+    private Component getTargetBlockTooltip() {
         if (targetBlockAsItem.getItem() == Blocks.BARRIER.asItem()) return Component.translatable("gui.smarter_observer.no_selected_target_block_hint").withColor(0xE00000);
         return Component.translatable("gui.smarter_observer.target_block_hint");
+    }
+
+    private String getTickString(Integer onForTicksValue) {
+        switch (tickViewMode) {
+            case ONLY_TICKS -> { return onForTicksValue + "t"; }
+
+            case TICK_SECONDS -> {
+                if (onForTicksValue >= 20) return onForTicksValue / 20 + "s";
+                return onForTicksValue + "t";
+            }
+
+            default -> throw new IllegalStateException("Impossible value of enum TickView!");
+        }
     }
 }
