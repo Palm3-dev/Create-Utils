@@ -12,11 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @MethodsReturnNonnullByDefault
 public class SOSettingsRepresenter {
 
-    public static final String NOT_NULL_STILL_NULL = "internal_still_not_set";
-
     protected static class SelectionRepresenter {
         public static final String DONT_DETECT = "internal_detect_disabled";
         public static final String CANT_DETECT = "internal_cannot_detect";
+        public static final String NOT_SET = "internal_still_not_set";
 
         private final LinkedHashMap<Integer, String> propertiesByIndex = new LinkedHashMap<>();
         private final LinkedHashMap<String, Integer> propsIndexesByProp = new LinkedHashMap<>();
@@ -24,7 +23,7 @@ public class SOSettingsRepresenter {
         private final LinkedHashMap<String, LinkedHashMap<Integer, String>> valuesByIndex_ByProp = new LinkedHashMap<>();
         private final LinkedHashMap<String, LinkedHashMap<String, Integer>> valuesIndexesByValue_ByProp = new LinkedHashMap<>();
 
-        private final boolean hasProperties;
+        public final boolean hasProperties;
 
 
         public SelectionRepresenter(Collection<Property<?>> targetBlockProperties) {
@@ -72,10 +71,6 @@ public class SOSettingsRepresenter {
                     propsIndex++;
                 }
             }
-        }
-
-        public boolean hasProps() {
-            return hasProperties;
         }
 
         public String getProp(Integer index) {
@@ -129,9 +124,12 @@ public class SOSettingsRepresenter {
         }
 
         public static Component checkAndTranslateStatics(String stringToCheck) {
-            if (stringToCheck.equals(DONT_DETECT)) return Component.translatable("gui.smarter_observer.internal_detect_disabled");
-            if (stringToCheck.equals(CANT_DETECT)) return Component.translatable("gui.smarter_observer.internal_cannot_detect");
-            return Component.literal(stringToCheck);
+            return switch (stringToCheck) {
+                case DONT_DETECT -> Component.translatable("gui.smarter_observer.internal_detect_disabled");
+                case CANT_DETECT -> Component.translatable("gui.smarter_observer.internal_cannot_detect");
+                case NOT_SET -> Component.translatable("gui.smarter_observer.internal_still_not_set");
+                default -> Component.literal(stringToCheck);
+            };
         }
     }
 

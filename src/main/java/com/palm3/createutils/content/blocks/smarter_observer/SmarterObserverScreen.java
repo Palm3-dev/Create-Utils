@@ -16,11 +16,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 public class SmarterObserverScreen extends AbstractSimiScreen {
@@ -60,7 +62,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         this.sobe = sobe;
 
         smarterObserver = new ItemStack(CUBlocks.SMARTER_OBSERVER.get());
-        targetBlockAsItem = new ItemStack(sobe.targetBlock);
+        targetBlockAsItem = new ItemStack(sobe.targetBlock == Blocks.AIR ? Blocks.BARRIER : sobe.targetBlock);
 
         // Save current BE settings, uses those for the logic. Are set to CANT/DONT_DETECT when you set the block filter.
         currentTargetProperty = sobe.targetProperty;
@@ -221,19 +223,16 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
 
         // Target block tooltip
         if ((mouseX > x + 13 && mouseX <= x + 29) && (mouseY > y + 106 && mouseY <= y + 122)) {
-            CUMain.LOGGER.info("fd");
             graphics.renderTooltip(
                     font,
-                    Component.translatable("gui.smarter_observer.target_block_hint"),
+                    getTargetBlockTooltip(targetBlockAsItem),
                     mouseX, mouseY
             );
         }
     }
 
-    protected static void openScreen(SmarterObserverBlockEntity sobe, Level level) {
-        if (sobe.targetBlock != null & sobe.targetBlock != Blocks.AIR)
-            ScreenOpener.open(new SmarterObserverScreen(sobe));
-        else if (!level.isClientSide)
-            level.playSound(null, sobe.getBlockPos(), SoundEvents.NOTE_BLOCK_DIDGERIDOO.value(), SoundSource.BLOCKS, 1.0f, 0.90f);
+    private Component getTargetBlockTooltip(ItemStack targetBlockAsItem) {
+        if (targetBlockAsItem.getItem() == Blocks.BARRIER.asItem()) return Component.translatable("gui.smarter_observer.no_selected_target_block_hint").withColor(0xE00000);
+        return Component.translatable("gui.smarter_observer.target_block_hint");
     }
 }

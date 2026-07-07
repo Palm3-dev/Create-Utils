@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -33,11 +34,11 @@ import java.util.List;
 public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
     // Filtering targets
-    public Block targetBlock;  // Set by the filter, not in the screen
+    public Block targetBlock = Blocks.AIR;  // Default to air (no filter). Has no properties.
     private static final String targetBlock_Tag = "target_block";
-    public String targetProperty = SOSettingsRepresenter.NOT_NULL_STILL_NULL;
+    public String targetProperty = SelectionRepresenter.NOT_SET;
     private static final String targetProperty_Tag = "target_property";
-    public String targetValue = SOSettingsRepresenter.NOT_NULL_STILL_NULL;
+    public String targetValue = SelectionRepresenter.NOT_SET;
     private static final String targetValue_Tag = "target_prop_value";
 
     // Behaviour settings

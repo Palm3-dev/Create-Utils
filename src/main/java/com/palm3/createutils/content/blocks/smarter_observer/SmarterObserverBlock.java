@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.palm3.createutils.CUMain;
 import com.palm3.createutils.register.CUBlockEntities;
 import com.simibubi.create.foundation.block.IBE;
+import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -113,7 +114,8 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
     @Override
     public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        withBlockEntityDo(level, pos, be -> SmarterObserverScreen.openScreen(be, level));
+        //withBlockEntityDo(level, pos, be -> SmarterObserverScreen.openScreen(be, level));  // OLD
+        withBlockEntityDo(level, pos, be -> ScreenOpener.open(new SmarterObserverScreen(be)));
         return InteractionResult.CONSUME;
     }
 
