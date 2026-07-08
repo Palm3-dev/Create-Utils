@@ -1,18 +1,14 @@
 package com.palm3.createutils.content.blocks.smarter_observer;
 
-import com.mojang.serialization.MapCodec;
 import com.palm3.createutils.CUMain;
-import com.palm3.createutils.Helpers;
 import com.palm3.createutils.register.CUBlockEntities;
 import com.simibubi.create.AllItems;
-import com.simibubi.create.AllSoundEvents;
 import com.simibubi.create.content.redstone.DirectedDirectionalBlock;
 import com.simibubi.create.foundation.block.IBE;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -124,12 +120,15 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
     }
 
 
-    //.------------------- behaviour -------------------
+    //------------------- BEHAVIOUR -------------------
     @Override
     public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (level.isClientSide) return InteractionResult.SUCCESS;
-        withBlockEntityDo(level, pos, be -> ScreenOpener.open(new SmarterObserverScreen(be)));
-        return InteractionResult.CONSUME;
+        if (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() != AllItems.WRENCH.asItem()) {
+            if (level.isClientSide) return InteractionResult.SUCCESS;
+            withBlockEntityDo(level, pos, be -> ScreenOpener.open(new SmarterObserverScreen(be)));
+            return InteractionResult.CONSUME;
+        }
+        return InteractionResult.PASS;
     }
 
     @Override
