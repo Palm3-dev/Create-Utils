@@ -2,15 +2,23 @@ package com.palm3.createutils.content.blocks.smarter_observer;
 
 import com.mojang.serialization.MapCodec;
 import com.palm3.createutils.CUMain;
+import com.palm3.createutils.Helpers;
 import com.palm3.createutils.register.CUBlockEntities;
+import com.simibubi.create.AllItems;
+import com.simibubi.create.AllSoundEvents;
+import com.simibubi.create.content.redstone.DirectedDirectionalBlock;
 import com.simibubi.create.foundation.block.IBE;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -33,7 +41,7 @@ import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class SmarterObserverBlock extends Block implements EntityBlock, IBE<SmarterObserverBlockEntity> {
+public class SmarterObserverBlock extends DirectedDirectionalBlock implements EntityBlock, IBE<SmarterObserverBlockEntity> {
     /*
      * Detection is structured by layers; power actions determine time on, time off etc.:
      *
@@ -56,24 +64,22 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
      *                                                                                                           - NO --> skip
      *                                                                                                           - YES --> power actions
      */
-
-    public static final MapCodec<SmarterObserverBlock> CODEC = simpleCodec(SmarterObserverBlock::new);
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
-
+    public static final DirectionProperty H_FACING = DirectedDirectionalBlock.FACING;
 
     public SmarterObserverBlock(BlockBehaviour.Properties props) {
         super(props);
         this.registerDefaultState(this.defaultBlockState()
                 .setValue(POWERED, false)
-                .setValue(FACING, Direction.NORTH)
+                .setValue(H_FACING, Direction.NORTH)
+                .setValue(TARGET, AttachFace.WALL)
         );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(POWERED, FACING);
+        builder.add(POWERED);
     }
 
     @Override
@@ -89,11 +95,17 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         if (context.getPlayer() != null) {
-            if (context.getPlayer().isShiftKeyDown())
-                return defaultBlockState().setValue(FACING, context.getNearestLookingDirection().getOpposite());
-            else
-                return defaultBlockState().setValue(FACING, context.getNearestLookingDirection());
-        } else throw new IllegalArgumentException("Player cannot be null to check if pressing shift key!");
+            Direction lookDir = context.getNearestLookingDirection();
+            if (context.getPlayer().isShiftKeyDown()) {
+                return defaultBlockState()
+                        .setValue(H_FACING, context.getHorizontalDirection())
+                        .setValue(TARGET, lookDir == Direction.UP ? AttachFace.CEILING : lookDir == Direction.DOWN ? AttachFace.FLOOR : AttachFace.WALL);
+            } else {
+                return defaultBlockState()
+                        .setValue(H_FACING, context.getHorizontalDirection().getOpposite())
+                        .setValue(TARGET, lookDir == Direction.UP ? AttachFace.FLOOR : lookDir == Direction.DOWN ? AttachFace.CEILING : AttachFace.WALL);
+            }
+        } else throw new IllegalArgumentException("Player is null!");
     }
 
     @Override
@@ -111,16 +123,15 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
         return CUBlockEntities.SMARTER_OBSERVER_BE.get();
     }
 
+
+    //.------------------- behaviour -------------------
     @Override
     public @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (level.isClientSide) return InteractionResult.SUCCESS;
-        //withBlockEntityDo(level, pos, be -> SmarterObserverScreen.openScreen(be, level));  // OLD
         withBlockEntityDo(level, pos, be -> ScreenOpener.open(new SmarterObserverScreen(be)));
         return InteractionResult.CONSUME;
     }
 
-
-    // Behaviour
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         super.onPlace(state, level, pos, oldState, isMoving);
@@ -128,8 +139,8 @@ public class SmarterObserverBlock extends Block implements EntityBlock, IBE<Smar
 
     @Override
     protected @NotNull BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
-        if (state.getValue(FACING) == facing) {
-            CUMain.LOGGER.info("THE CHANGE WAS IN FACING DIR.");
+        if (state.getValue(H_FACING) == facing) {
+            CUMain.LOGGER.info("THE CHANGE WAS IN H_FACING DIR.");
         }
 
         return super.updateShape(state, facing, facingState, level, currentPos, facingPos);

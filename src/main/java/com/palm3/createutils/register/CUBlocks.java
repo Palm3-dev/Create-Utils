@@ -10,10 +10,12 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
+import org.lwjgl.system.windows.POINT;
 
 import static com.palm3.createutils.CUMain.*;
 import static com.palm3.createutils.Helpers.*;
@@ -30,23 +32,22 @@ public class CUBlocks {
                 ModelFile unpowered = p.models().getExistingFile(modRes("block/smarter_observer/observer_unpowered"));
 
                 p.getVariantBuilder(c.getEntry()).forAllStates(state -> {
+                    Direction hFacing = state.getValue(SmarterObserverBlock.FACING);
+                    AttachFace target = state.getValue(SmarterObserverBlock.TARGET);
                     ModelFile model = state.getValue(SmarterObserverBlock.POWERED) ? powered : unpowered;
 
-                    Direction facing = state.getValue(SmarterObserverBlock.FACING);
-
-                    int xRot = switch (facing) {
-                        case DOWN -> 270;
-                        case UP -> 90;
-                        default -> 0;
+                    int xRot = switch (target) {
+                        case WALL -> 0;
+                        case FLOOR -> 90;
+                        case CEILING -> -90;
                     };
 
-                    int yRot = switch (facing) {
+                    int yRot = switch (hFacing) {
                         case EAST -> 90;
                         case SOUTH -> 180;
                         case WEST -> 270;
                         default -> 0;
                     };
-
 
                     return ConfiguredModel.builder().modelFile(model).rotationY(yRot).rotationX(xRot).build();
                 });
