@@ -48,6 +48,10 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     public Integer onForTicks = 2;  // Should be 1 redstone tick, i think? Used by screen to know (when block placed for the first time) what to put in scroll input.
     private static final String onForTicksTag = "on_for_ticks";
 
+    // Screen settings
+    public boolean showOnlyTicks = true;
+    private static final String showOnlyTicksTag = "s_show_only_ticks";  // First 's' stands for screen.
+
     // Block Filter
     private FilteringBehaviour filteringBehaviour;
 
@@ -95,6 +99,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         tag.putString(targetValue_Tag, targetValue);
         tag.putString(detectModeTag, detectMode);
         tag.putInt(onForTicksTag, onForTicks);
+        // Screen settings
+        tag.putBoolean(showOnlyTicksTag, showOnlyTicks);
     }
 
     @Override
@@ -105,6 +111,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         this.targetValue = tag.getString(targetValue_Tag);
         this.detectMode = tag.getString(detectModeTag);
         this.onForTicks = tag.getInt(onForTicksTag);
+        // Screen settings
+        this.showOnlyTicks = tag.getBoolean(showOnlyTicksTag);
     }
 
     protected Collection<Property<?>> getTargetBlockProps() {

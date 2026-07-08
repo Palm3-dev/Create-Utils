@@ -15,6 +15,7 @@ public class SmarterObserverPacket extends BlockEntityConfigurationPacket<Smarte
             ByteBufCodecs.STRING_UTF8, packet -> packet.targetValue,
             ByteBufCodecs.STRING_UTF8, packet -> packet.detectMode,
             ByteBufCodecs.INT, packet -> packet.onForTicks,
+            ByteBufCodecs.BOOL, packet -> packet.showOnlyTicks,
             SmarterObserverPacket::new
     );
 
@@ -22,13 +23,15 @@ public class SmarterObserverPacket extends BlockEntityConfigurationPacket<Smarte
     private final String targetValue;
     private final String detectMode;
     private final Integer onForTicks;
+    private final Boolean showOnlyTicks;
 
-    public SmarterObserverPacket(BlockPos pos, String targetProperty, String targetValue, String detectMode, Integer onForTicks) {
+    public SmarterObserverPacket(BlockPos pos, String targetProperty, String targetValue, String detectMode, Integer onForTicks, Boolean showOnlyTicks) {
         super(pos);
         this.targetProperty = targetProperty;
         this.targetValue = targetValue;
         this.detectMode = detectMode;
         this.onForTicks = onForTicks;
+        this.showOnlyTicks = showOnlyTicks;
     }
 
     // Applies received settings on server
@@ -38,6 +41,7 @@ public class SmarterObserverPacket extends BlockEntityConfigurationPacket<Smarte
         sobe.targetValue = targetValue;
         sobe.detectMode = detectMode;
         sobe.onForTicks = onForTicks;
+        sobe.showOnlyTicks = showOnlyTicks;
         sobe.setChanged();
     }
 

@@ -43,30 +43,8 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
 
     // Textures - buttons - others
     private IconButton detectModeSetter;
-    private IconButton tickViewModeSetter;
-    private enum TickView {
-        ONLY_TICKS,
-        TICK_SECONDS;
-
-        TickView() {}
-
-        private static TickView getNext(TickView currentTickViewMode) {
-            switch (currentTickViewMode) {
-                case ONLY_TICKS -> { return TICK_SECONDS; }
-                case TICK_SECONDS -> { return ONLY_TICKS; }
-                default -> throw new IllegalArgumentException("Given currentTickViewMode enum value doesn't exist!");
-            }
-        }
-
-        private static CUGuiTextures getIcon(TickView currentTickViewMode) {
-            switch (currentTickViewMode) {
-                case TICK_SECONDS -> { return CUGuiTextures.TICK_SECONDS_I; }
-                case ONLY_TICKS -> { return CUGuiTextures.TICK_I; }
-                default -> throw new IllegalArgumentException("Given currentTickViewMode enum value doesn't exist!");
-            }
-        }
-    }  // To represent tick view mode
-    private TickView tickViewMode = TickView.ONLY_TICKS;
+    private IconButton showOnlyTicksSetter;
+    private boolean showOnlyTicks;
     private IconButton confirmButton;
     private CUGuiTextures background;
     private final ItemStack smarterObserver;
@@ -87,6 +65,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         currentTargetValue = sobe.targetValue;
         currentDetectMode = sobe.detectMode;
         currentOnForTicks = sobe.onForTicks;
+        showOnlyTicks = sobe.showOnlyTicks;
 
         // Safe, if nothing touched they need to be the same. Also needed for renderWindow().
         selectedTargetProperty = currentTargetProperty;
@@ -140,32 +119,26 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                 .addHint(Component.translatable("gui.smarter_observer.on_for_ticks_hint"))
                 .calling(i -> selectedOnForTicks = i)
                 .withStepFunction(sc -> {
-                    switch (tickViewMode) {
-                        case TICK_SECONDS -> {
-                            if (selectedOnForTicks >= 20) {
-                                if (sc.control) return 1200;  // 1 minute
-                                if (sc.shift) return 200;  // 10 seconds
-                                return 20;  // 1 second
-                            } else return 1;
-                        }
-
-                        case ONLY_TICKS -> {
-                            if (sc.control) return 200;  // 10 seconds
-                            if (sc.shift) return 20;  // 1 second
-                            return 1;  // 1 tick
-                        }
-
-                        default -> throw new IllegalStateException("Impossible value of enum TickView!");
+                    if (showOnlyTicks) {
+                        if (sc.control) return 200;  // 10 seconds
+                        if (sc.shift) return 20;  // 1 second
+                        return 1;  // 1 tick
+                    } else {
+                        if (selectedOnForTicks >= 20) {
+                            if (sc.control) return 1200;  // 1 minute
+                            if (sc.shift) return 200;  // 10 seconds
+                            return 20;  // 1 second
+                        } else return 1;
                     }
                 })
                 .setState(currentOnForTicks);  // Startup only
 
-        tickViewModeSetter = new IconButton(x + 73, y + 74, TickView.getIcon(tickViewMode));
-        tickViewModeSetter.withCallback(() -> {
-            tickViewMode = TickView.getNext(tickViewMode);
-            tickViewModeSetter.setIcon(TickView.getIcon(tickViewMode));
+        showOnlyTicksSetter = new IconButton(x + 73, y + 74, showOnlyTicks ? CUGuiTextures.TICK_I : CUGuiTextures.TICK_SECONDS_I);
+        showOnlyTicksSetter.withCallback(() -> {
+            showOnlyTicks = !showOnlyTicks;
+            showOnlyTicksSetter.setIcon(showOnlyTicks ? CUGuiTextures.TICK_I : CUGuiTextures.TICK_SECONDS_I);
             // Adjust ticks value to be the same as the rounded displayed seconds.
-            if (tickViewMode == TickView.TICK_SECONDS && selectedOnForTicks >= 20) {
+            if (!showOnlyTicks && selectedOnForTicks >= 20) {
                 selectedOnForTicks = (int) Math.floor((float) selectedOnForTicks / 20) * 20;
                 onForTicksSetter.setState(selectedOnForTicks);
             }
@@ -185,7 +158,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         addRenderableWidget(targetPropertySetter);
         addRenderableWidget(targetValueSetter);
         addRenderableWidget(onForTicksSetter);
-        addRenderableWidget(tickViewModeSetter);
+        addRenderableWidget(showOnlyTicksSetter);
         addRenderableWidget(detectModeSetter);
         addRenderableWidget(confirmButton);
     }
@@ -200,13 +173,16 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
             CUMain.LOGGER.info(" - Prop. value: {}", selectedTargetValue);
             CUMain.LOGGER.info(" - Detect behaviour: {}", selectedDetectMode);
             CUMain.LOGGER.info(" - On for ticks: {}", selectedOnForTicks);
+            CUMain.LOGGER.info("Observer Screen settings:");
+            CUMain.LOGGER.info(" - Tick view mode: {} [raw showOnlyTicks -> {}]", showOnlyTicks ? "Only ticks" : "Tick, sec, mins", showOnlyTicks);
         }
         CatnipServices.NETWORK.sendToServer(new SmarterObserverPacket(
                 sobe.getBlockPos(),
                 selectedTargetProperty,
                 selectedTargetValue,
                 selectedDetectMode,
-                selectedOnForTicks
+                selectedOnForTicks,
+                showOnlyTicks
         ));
     }
 
@@ -281,15 +257,8 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     }
 
     private String getTickString(Integer onForTicksValue) {
-        switch (tickViewMode) {
-            case ONLY_TICKS -> { return onForTicksValue + "t"; }
-
-            case TICK_SECONDS -> {
-                if (onForTicksValue >= 20) return onForTicksValue / 20 + "s";
-                return onForTicksValue + "t";
-            }
-
-            default -> throw new IllegalStateException("Impossible value of enum TickView!");
-        }
+        if (showOnlyTicks) return onForTicksValue + "t";
+        if (onForTicksValue >= 20) return onForTicksValue / 20 + "s";
+        return onForTicksValue + "t";
     }
 }
