@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.palm3.createutils.CUMain;
 import com.palm3.createutils.config.CUCommonConfig;
 import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.*;
+import com.simibubi.create.content.redstone.FilteredDetectorFilterSlot;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
 import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
@@ -66,17 +67,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     @Override
     public void addBehaviours(List<BlockEntityBehaviour> behaviours) {
 
-        filteringBehaviour = new FilteringBehaviour(this, new ValueBoxTransform() {
-            @Override
-            public Vec3 getLocalOffset(LevelAccessor level, BlockPos pos, BlockState state) {
-                return VecHelper.rotateCentered(VecHelper.voxelSpace(8, 12.2, 8.55f), 0, Direction.Axis.Y);
-            }
-
-            @Override
-            public void rotate(LevelAccessor level, BlockPos pos, BlockState state, PoseStack ms) {
-
-            }
-        });
+        filteringBehaviour = new FilteringBehaviour(this, new FilteredDetectorFilterSlot(false));
         filteringBehaviour.setLabel(Component.translatable("smarter_observer_be.target_block"));
         filteringBehaviour.setFilter(new ItemStack(Blocks.AIR.asItem()));
         filteringBehaviour.showCountWhen(() -> false);

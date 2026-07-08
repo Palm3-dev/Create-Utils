@@ -5,7 +5,7 @@
 		"1": "create_utils:block/smarter_observer/back_powered",
 		"3": "create_utils:block/smarter_observer/bottom",
 		"4": "create_utils:block/smarter_observer/face_powered",
-		"6": "create_utils:block/smarter_observer/observer_top",
+		"6": "create:block/smart_observer_top",
 		"7": "create_utils:block/smarter_observer/side_powered",
 		"particle": "create_utils:block/smarter_observer/side_unpowered_sx"
 	},
