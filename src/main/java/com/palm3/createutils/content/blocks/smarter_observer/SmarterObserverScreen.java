@@ -96,6 +96,10 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                     selectedTargetProperty = sr.getProp(i);
                     // Sets the range based on the current property, otherwise could crash due to the targetValueSetter going to search a value at non-existing indexes.
                     targetValueSetter.withRange(0, sr.getPValuesNumber(selectedTargetProperty, false));
+                    // Set to first value of the selected property, otherwise remains other property value.
+                    selectedTargetValue = sr.getPValue(selectedTargetProperty, 1);
+                    targetValueSetter.setState(1);
+
                     if (i == 0) {  // Detect disabled.
                         targetValueSetter.withRange(0, 1);  // If no property, cannot change the value.
                         targetValueSetter.setState(0);  // If no property to detect, you can't detect a value, am i right?
@@ -106,7 +110,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                 .setState(sr.getPropIndex(currentTargetProperty));  // Startup only
 
         targetValueSetter = new ScrollInput(x + 17, y + 49, 137, 16)
-                .withRange(0, 1)  // Range gets set by property scroll based on the selected property.
+                .withRange(0, sr.getPValuesNumber(currentTargetProperty, false))
                 .titled(Component.translatable("gui.smarter_observer.target_value_scroll"))
                 .addHint(Component.translatable("gui.smarter_observer.target_value_hint"))
                 .calling(i -> selectedTargetValue = sr.getPValue(selectedTargetProperty, i))
@@ -124,11 +128,15 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                         if (sc.shift) return 20;  // 1 second
                         return 1;  // 1 tick
                     } else {
-                        if (selectedOnForTicks >= 20) {
+                        if (selectedOnForTicks >= 1200) {  // Scale by minutes
+                            if (sc.shift) return 6000;  // 5 minutes
+                            return 1200;  // 1 minute
+                        }
+                        if (selectedOnForTicks >= 20) {  // Scale by seconds
                             if (sc.control) return 1200;  // 1 minute
                             if (sc.shift) return 200;  // 10 seconds
                             return 20;  // 1 second
-                        } else return 1;
+                        } else return 1;  // Scale by ticks
                     }
                 })
                 .setState(currentOnForTicks);  // Startup only
@@ -258,6 +266,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
 
     private String getTickString(Integer onForTicksValue) {
         if (showOnlyTicks) return onForTicksValue + "t";
+        if (onForTicksValue >= 1200) return onForTicksValue / 1200 + "m";
         if (onForTicksValue >= 20) return onForTicksValue / 20 + "s";
         return onForTicksValue + "t";
     }
