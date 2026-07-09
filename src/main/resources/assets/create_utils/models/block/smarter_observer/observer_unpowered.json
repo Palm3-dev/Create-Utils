@@ -20,7 +20,7 @@
 				"east": {"uv": [0, 0, 16, 16], "texture": "#8"},
 				"south": {"uv": [0, 0, 16, 16], "texture": "#2"},
 				"west": {"uv": [0, 0, 16, 16], "texture": "#0"},
-				"up": {"uv": [0, 0, 16, 16], "texture": "#6"},
+				"up": {"uv": [0, 0, 16, 16], "rotation": 180, "texture": "#6"},
 				"down": {"uv": [0, 0, 16, 16], "rotation": 180, "texture": "#3"}
 			}
 		}

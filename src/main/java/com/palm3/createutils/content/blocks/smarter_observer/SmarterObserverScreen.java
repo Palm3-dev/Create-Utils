@@ -161,7 +161,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         });
 
         confirmButton = new IconButton(x + 149, y + 105, AllIcons.I_CONFIRM);
-        confirmButton.withCallback(() -> onClose());
+        confirmButton.withCallback(this::onClose);
 
         addRenderableWidget(targetPropertySetter);
         addRenderableWidget(targetValueSetter);

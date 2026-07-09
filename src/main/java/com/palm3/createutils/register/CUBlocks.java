@@ -1,6 +1,5 @@
 package com.palm3.createutils.register;
 
-import com.palm3.createutils.Helpers;
 import com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.SharedProperties;
@@ -9,13 +8,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
-import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
-import org.lwjgl.system.windows.POINT;
 
 import static com.palm3.createutils.CUMain.*;
 import static com.palm3.createutils.Helpers.*;
