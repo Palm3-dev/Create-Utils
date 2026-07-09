@@ -1,33 +1,27 @@
 package com.palm3.createutils.content.blocks.smarter_observer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.palm3.createutils.CUMain;
 import com.palm3.createutils.config.CUCommonConfig;
 import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.*;
 import com.simibubi.create.content.redstone.FilteredDetectorFilterSlot;
 import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import com.simibubi.create.foundation.blockEntity.behaviour.BlockEntityBehaviour;
-import com.simibubi.create.foundation.blockEntity.behaviour.ValueBoxTransform;
 import com.simibubi.create.foundation.blockEntity.behaviour.filtering.FilteringBehaviour;
-import net.createmod.catnip.math.VecHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.phys.Vec3;
+import static com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.SelectionRepresenter.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,6 +41,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     private static final String detectModeTag = "detect_mode";
     public Integer onForTicks = 2;  // Should be 1 redstone tick, i think? Used by screen to know (when block placed for the first time) what to put in scroll input.
     private static final String onForTicksTag = "on_for_ticks";
+    public Block previousBlockInFront = Blocks.AIR;
+    private static final String previousBlockInFrontTag = "prev_block_front";
 
     // Screen settings
     public boolean showOnlyTicks = true;
@@ -99,6 +95,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         tag.putString(targetValue_Tag, targetValue);
         tag.putString(detectModeTag, detectMode);
         tag.putInt(onForTicksTag, onForTicks);
+        tag.putString(previousBlockInFrontTag, blockToString(previousBlockInFront));
         // Screen settings
         tag.putBoolean(showOnlyTicksTag, showOnlyTicks);
     }
@@ -111,12 +108,18 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         this.targetValue = tag.getString(targetValue_Tag);
         this.detectMode = tag.getString(detectModeTag);
         this.onForTicks = tag.getInt(onForTicksTag);
+        this.previousBlockInFront = stringToBlock(tag.getString(previousBlockInFrontTag));
         // Screen settings
         this.showOnlyTicks = tag.getBoolean(showOnlyTicksTag);
     }
 
     protected Collection<Property<?>> getTargetBlockProps() {
         return targetBlock.getStateDefinition().getProperties();
+    }
+
+    protected boolean detectPropsAndValues() {
+        return (!targetProperty.equals(DONT_DETECT) && !targetProperty.equals(CANT_DETECT)) ||
+                (!targetValue.equals(DONT_DETECT) && !targetValue.equals(CANT_DETECT));
     }
 
 
