@@ -45,6 +45,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     private static final String onForTicksTag = "on_for_ticks";
     public Block previousBlockInFront = Blocks.AIR;
     private static final String previousBlockInFrontTag = "prev_block_front";
+    public String blockRemovedDetectingPropsBh = SelectionRepresenter.NOT_SET;  // bh -> behaviour
+    private static final String blockRemovedDetectingPropsBhTag = "block_rem_detect_props_bh";
 
     // Screen settings
     public boolean showOnlyTicks = true;
@@ -98,6 +100,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         tag.putString(detectModeTag, detectMode);
         tag.putInt(onForTicksTag, onForTicks);
         tag.putString(previousBlockInFrontTag, blockToString(previousBlockInFront));
+        tag.putString(blockRemovedDetectingPropsBhTag, blockRemovedDetectingPropsBh);
         // Screen settings
         tag.putBoolean(showOnlyTicksTag, showOnlyTicks);
     }
@@ -111,6 +114,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         this.detectMode = tag.getString(detectModeTag);
         this.onForTicks = tag.getInt(onForTicksTag);
         this.previousBlockInFront = stringToBlock(tag.getString(previousBlockInFrontTag));
+        this.blockRemovedDetectingPropsBh = tag.getString(blockRemovedDetectingPropsBhTag);
         // Screen settings
         this.showOnlyTicks = tag.getBoolean(showOnlyTicksTag);
     }
