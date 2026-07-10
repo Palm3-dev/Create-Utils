@@ -15,6 +15,9 @@ public enum CUGuiTextures implements ScreenElement, TextureSheetSegment {
     BLOCK_PLACED_REMOVED_I("icons", 32, 0, 16, 16),
     TICK_I("icons", 48, 0, 16, 16),
     TICK_SECONDS_I("icons", 64, 0, 16, 16),
+    GRASS_SNOW_GRASS_I("icons", 80, 0, 16, 16),
+    GRASS_SNOW_GRASS_PLANK_I("icons", 96, 0, 16, 16),
+    GRASS_PLANKS_I("icons", 112, 0, 16, 16),
 
     // Backgrounds
     SMARTER_OBSERVER_BACKGROUND("smarter_observer_background", 182, 129);

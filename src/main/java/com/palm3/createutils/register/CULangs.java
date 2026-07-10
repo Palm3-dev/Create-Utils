@@ -27,5 +27,8 @@ public class CULangs {
         add("gui.smarter_observer.detect_both_tooltip", "Detect when the target block is placed or removed.");
         add("gui.smarter_observer.target_block_hint", "Currently selected target");
         add("gui.smarter_observer.no_selected_target_block_hint", "No target selected.");
+        add("gui.smarter_observer.detect_props_only_if_block_changes_tooltip", "Detect the block removal only if the property value matches the targets.");
+        add("gui.smarter_observer.detect_block_if_changes_tooltip", "Detect the block removal even if it doesn't have matching property value.");
+        add("gui.smarter_observer.locked_for_no_props_tooltip", "Locked for no properties!");
     }
 }
