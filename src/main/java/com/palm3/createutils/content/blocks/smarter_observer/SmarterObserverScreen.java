@@ -26,12 +26,14 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     private final String currentTargetValue;
     private final String currentDetectMode;
     private final Integer currentOnForTicks;
+    private final String currentBRDPBh;
 
     // Final values.
     private String selectedTargetProperty;
     private String selectedTargetValue;
     private String selectedDetectMode;
     private Integer selectedOnForTicks;
+    private String selectedBRDPBh;
 
     // To get all the properties/values.
     private final SelectionRepresenter sr;
@@ -44,6 +46,8 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     // Textures - buttons - others
     private IconButton detectModeSetter;
     private IconButton showOnlyTicksSetter;
+    private IconButton blockRemovedDetectingPropsSetter;
+    private String blockRemovedDetectingPropsBh;
     private boolean showOnlyTicks;
     private IconButton confirmButton;
     private CUGuiTextures background;
@@ -66,12 +70,16 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         currentDetectMode = sobe.detectMode;
         currentOnForTicks = sobe.onForTicks;
         showOnlyTicks = sobe.showOnlyTicks;
+        // This check is required here but not on the property/value because those are used to know if there are properties to detect or not (if NOT_SET there aren't props at all).
+        // Here it needs to be always set to something.
+        currentBRDPBh = currentTargetProperty.equals(SelectionRepresenter.NOT_SET) ? BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS : sobe.blockRemovedDetectingPropsBh;
 
         // Safe, if nothing touched they need to be the same. Also needed for renderWindow().
         selectedTargetProperty = currentTargetProperty;
         selectedTargetValue = currentTargetValue;
         selectedDetectMode = sobe.detectMode;
         selectedOnForTicks = currentOnForTicks;
+        selectedBRDPBh = currentBRDPBh;
 
         sr = new SelectionRepresenter(sobe.getTargetBlockProps());
     }
@@ -104,6 +112,11 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                         targetValueSetter.withRange(0, 1);  // If no property, cannot change the value.
                         targetValueSetter.setState(0);  // If no property to detect, you can't detect a value, am i right?
                         selectedTargetValue = SelectionRepresenter.DONT_DETECT;  // Set to don't detect, not updated automatically after setState(0).
+
+                        // Update BRDPBh button, no props selected
+                        blockRemovedDetectingPropsSetter.setIcon(BlockRemovedDetectingPropsBhRepresenter.getIcon(BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS));
+                        blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS));
+                        selectedBRDPBh = BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS;
                     }
                 })
                 .withStepFunction(sc -> 1)
@@ -160,6 +173,16 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
             detectModeSetter.setToolTip(DetectModeRepresenter.getTooltip(selectedDetectMode));
         });
 
+        blockRemovedDetectingPropsSetter = new IconButton(x + 96, y + 105, BlockRemovedDetectingPropsBhRepresenter.getIcon(currentBRDPBh));
+        blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(currentBRDPBh));
+        blockRemovedDetectingPropsSetter.withCallback(() -> {
+            if (!selectedBRDPBh.equals(BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS)) {
+                selectedBRDPBh = BlockRemovedDetectingPropsBhRepresenter.getNext(selectedBRDPBh);
+                blockRemovedDetectingPropsSetter.setIcon(BlockRemovedDetectingPropsBhRepresenter.getIcon(selectedBRDPBh));
+                blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(selectedBRDPBh));
+            }
+        });
+
         confirmButton = new IconButton(x + 149, y + 105, AllIcons.I_CONFIRM);
         confirmButton.withCallback(this::onClose);
 
@@ -168,6 +191,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         addRenderableWidget(onForTicksSetter);
         addRenderableWidget(showOnlyTicksSetter);
         addRenderableWidget(detectModeSetter);
+        addRenderableWidget(blockRemovedDetectingPropsSetter);
         addRenderableWidget(confirmButton);
     }
 
@@ -190,6 +214,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                 selectedTargetValue,
                 selectedDetectMode,
                 selectedOnForTicks,
+                selectedBRDPBh,
                 showOnlyTicks
         ));
     }
