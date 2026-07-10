@@ -24,6 +24,8 @@ public class SOSettingsRepresenter {
         private final LinkedHashMap<String, LinkedHashMap<Integer, String>> valuesByIndex_ByProp = new LinkedHashMap<>();
         private final LinkedHashMap<String, LinkedHashMap<String, Integer>> valuesIndexesByValue_ByProp = new LinkedHashMap<>();
 
+        private final LinkedHashMap<String, Property<?>> truePropertiesByProp = new LinkedHashMap<>();
+
         public final boolean hasProperties;
 
 
@@ -48,6 +50,7 @@ public class SOSettingsRepresenter {
                 for (Property<?> property : targetBlockProperties) {
                     propertiesByIndex.put(propsIndex, property.getName());
                     propsIndexesByProp.put(property.getName(), propsIndex);
+                    truePropertiesByProp.put(property.getName(), property);
 
                     LinkedHashMap<Integer, String> valuesByIndex = new LinkedHashMap<>();
                     LinkedHashMap<String, Integer> valuesIndexesByValue = new LinkedHashMap<>();
@@ -131,6 +134,23 @@ public class SOSettingsRepresenter {
                 case NOT_SET -> Component.translatable("gui.smarter_observer.internal_still_not_set");
                 default -> Component.literal(stringToCheck);
             };
+        }
+
+        // Used for controls, not for setting (usually).
+        public boolean hasProp(String prop) {
+            return propertiesByIndex.containsValue(prop);
+        }
+
+        public boolean hasPValue(String correspondingProp, String value) {
+            if (valuesByIndex_ByProp.get(correspondingProp) == null)
+                throw new IllegalArgumentException("The requested LinkedHashMap<Integer, String> at the give property [" + correspondingProp + "] doesn't exist!");
+            return valuesByIndex_ByProp.get(correspondingProp).containsValue(value);
+        }
+
+        public Property<?> getProp(String prop) {
+            if (truePropertiesByProp.get(prop) == null)
+                throw new IllegalArgumentException("The given property [" + prop + "] doesn't exist in LinkedHashMap<String, Property<?>> (properties by property as string)!");
+            return truePropertiesByProp.get(prop);
         }
     }
 
