@@ -33,9 +33,9 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     // Filtering targets
     public Block targetBlock = Blocks.AIR;  // Default to air (no filter). Has no properties.
     private static final String targetBlock_Tag = "target_block";
-    public String targetProperty = SelectionRepresenter.NOT_SET;
+    public String targetProperty = SelectionRepresenter.NOT_SET;  // Set with target block
     private static final String targetProperty_Tag = "target_property";
-    public String targetValue = SelectionRepresenter.NOT_SET;
+    public String targetValue = SelectionRepresenter.NOT_SET;  // Set with target block
     private static final String targetValue_Tag = "target_prop_value";
 
     // Behaviour settings
@@ -81,9 +81,11 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
             if (getTargetBlockProps().isEmpty()) {  // No props and thus values.
                 targetProperty = SelectionRepresenter.CANT_DETECT;
                 targetValue = SelectionRepresenter.CANT_DETECT;
+                blockRemovedDetectingPropsBh = BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS;
             } else {
                 targetProperty = SelectionRepresenter.DONT_DETECT;
                 targetValue = SelectionRepresenter.DONT_DETECT;
+                blockRemovedDetectingPropsBh = BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS;
             }
             if (CUCommonConfig.LOG_ALL.getAsBoolean()) CUMain.LOGGER.info("Selected filter: {}", Block.byItem(is.getItem()));
             this.setChanged();
