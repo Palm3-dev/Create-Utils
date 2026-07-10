@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @MethodsReturnNonnullByDefault
 public class SOSettingsRepresenter {
 
+    // Used for screen and also block for checking matching props.
     protected static class SelectionRepresenter {
         public static final String DONT_DETECT = "internal_detect_disabled";
         public static final String CANT_DETECT = "internal_cannot_detect";
@@ -162,6 +163,39 @@ public class SOSettingsRepresenter {
                 case DETECT_REMOVED -> { return Component.translatable("gui.smarter_observer.detect_removed_tooltip"); }
                 case DETECT_BOTH -> { return Component.translatable("gui.smarter_observer.detect_both_tooltip"); }
                 default -> throw new IllegalArgumentException("The given detect behaviour [" + currentDetectBehaviour + "] doesn't exist!");
+            }
+        }
+    }
+
+    protected static class BlockRemovedDetectingPropsBhRepresenter {
+        // Representer of the behaviour of the observer if a block is removed while detecting the properties & values. Either detect it or skip and detect properties only.
+        public static final String DETECT_ONLY_PROPS = "detect_only_props";  // If block changes without having correct properties/values, skip.
+        public static final String DETECT_BLOCK_CHANGE = "detect_block_change";  // If block changes without having correct properties/values, detect.
+        public static final String LOCKED_FOR_NO_PROPS = "locked_for_no_props";  // Used if properties don't need to be detected.
+
+        public static String getNext(String currentBlockRemovedPropBh) {
+            switch (currentBlockRemovedPropBh) {
+                case DETECT_ONLY_PROPS -> { return DETECT_BLOCK_CHANGE; }
+                case DETECT_BLOCK_CHANGE -> { return DETECT_ONLY_PROPS; }
+                default -> throw new IllegalArgumentException("The given behaviour [" + currentBlockRemovedPropBh + "] doesn't exist or shouldn't be used here!");
+            }
+        }
+
+        public static CUGuiTextures getIcon(String currentBlockRemovedPropBh) {
+            switch (currentBlockRemovedPropBh) {
+                case DETECT_ONLY_PROPS -> { return CUGuiTextures.GRASS_SNOW_GRASS_I; }
+                case DETECT_BLOCK_CHANGE -> { return CUGuiTextures.GRASS_SNOW_GRASS_PLANK_I; }
+                case LOCKED_FOR_NO_PROPS -> { return CUGuiTextures.GRASS_PLANKS_I; }
+                default -> throw new IllegalArgumentException("The given behaviour [" + currentBlockRemovedPropBh + "] doesn't exist!");
+            }
+        }
+
+        public static Component getTooltip(String currentBlockRemovedPropBh) {
+            switch (currentBlockRemovedPropBh) {
+                case DETECT_ONLY_PROPS -> { return Component.translatable("gui.smarter_observer.detect_props_only_if_block_changes_tooltip"); }
+                case DETECT_BLOCK_CHANGE -> { return Component.translatable("gui.smarter_observer.detect_block_if_changes_tooltip"); }
+                case LOCKED_FOR_NO_PROPS -> { return Component.translatable("gui.smarter_observer.locked_for_no_props_tooltip").withColor(0xE00000); }
+                default -> throw new IllegalArgumentException("The given behaviour [" + currentBlockRemovedPropBh + "] doesn't exist!");
             }
         }
     }
