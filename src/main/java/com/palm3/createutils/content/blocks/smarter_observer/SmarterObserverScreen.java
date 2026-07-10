@@ -70,9 +70,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         currentDetectMode = sobe.detectMode;
         currentOnForTicks = sobe.onForTicks;
         showOnlyTicks = sobe.showOnlyTicks;
-        // This check is required here but not on the property/value because those are used to know if there are properties to detect or not (if NOT_SET there aren't props at all).
-        // Here it needs to be always set to something.
-        currentBRDPBh = currentTargetProperty.equals(SelectionRepresenter.NOT_SET) ? BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS : sobe.blockRemovedDetectingPropsBh;
+        currentBRDPBh = sobe.blockRemovedDetectingPropsBh;
 
         // Safe, if nothing touched they need to be the same. Also needed for renderWindow().
         selectedTargetProperty = currentTargetProperty;
@@ -107,6 +105,11 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                     // Set to first value of the selected property, otherwise remains other property value.
                     selectedTargetValue = sr.getPValue(selectedTargetProperty, 1);
                     targetValueSetter.setState(1);
+
+                    // Update BRDPBh button, now can be set and changes icon,
+                    blockRemovedDetectingPropsSetter.setIcon(BlockRemovedDetectingPropsBhRepresenter.getIcon(BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS));
+                    blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS));
+                    selectedBRDPBh = BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS;
 
                     if (i == 0) {  // Detect disabled.
                         targetValueSetter.withRange(0, 1);  // If no property, cannot change the value.
@@ -197,7 +200,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
 
     @Override
     public void removed() {
-        if (CUCommonConfig.LOG_ALL.getAsBoolean()) {
+        if (CUCommonConfig.LOG_ALL.getAsBoolean() || CUCommonConfig.LOG_SMARTER_OBSERVER.getAsBoolean()) {
             CUMain.LOGGER.info("");
             CUMain.LOGGER.info("Observer settings:");
             CUMain.LOGGER.info(" - Block: {}", sobe.targetBlock);
@@ -205,6 +208,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
             CUMain.LOGGER.info(" - Prop. value: {}", selectedTargetValue);
             CUMain.LOGGER.info(" - Detect behaviour: {}", selectedDetectMode);
             CUMain.LOGGER.info(" - On for ticks: {}", selectedOnForTicks);
+            CUMain.LOGGER.info(" - blockRemovedDetectingPropsBh: {}", selectedBRDPBh);
             CUMain.LOGGER.info("Observer Screen settings:");
             CUMain.LOGGER.info(" - Tick view mode: {} [raw showOnlyTicks -> {}]", showOnlyTicks ? "Only ticks" : "Tick, sec, mins", showOnlyTicks);
         }

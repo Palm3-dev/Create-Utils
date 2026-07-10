@@ -45,7 +45,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     private static final String onForTicksTag = "on_for_ticks";
     public Block previousBlockInFront = Blocks.AIR;
     private static final String previousBlockInFrontTag = "prev_block_front";
-    public String blockRemovedDetectingPropsBh = SelectionRepresenter.NOT_SET;  // bh -> behaviour
+    public String blockRemovedDetectingPropsBh = BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS;
+    // bh -> behaviour. Default to this since at first startup no properties are selected, always.
     private static final String blockRemovedDetectingPropsBhTag = "block_rem_detect_props_bh";
 
     // Screen settings
@@ -81,11 +82,9 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
             if (getTargetBlockProps().isEmpty()) {  // No props and thus values.
                 targetProperty = SelectionRepresenter.CANT_DETECT;
                 targetValue = SelectionRepresenter.CANT_DETECT;
-                blockRemovedDetectingPropsBh = BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS;
             } else {
                 targetProperty = SelectionRepresenter.DONT_DETECT;
                 targetValue = SelectionRepresenter.DONT_DETECT;
-                blockRemovedDetectingPropsBh = BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS;
             }
             if (CUCommonConfig.LOG_ALL.getAsBoolean()) CUMain.LOGGER.info("Selected filter: {}", Block.byItem(is.getItem()));
             this.setChanged();
