@@ -19,6 +19,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+
+import static com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock.dl;
 import static com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.SelectionRepresenter.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -46,7 +48,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
     // Screen settings
     public boolean showOnlyTicks = true;
-    private static final String showOnlyTicksTag = "s_show_only_ticks";  // First 's' stands for screen.
+    private static final String showOnlyTicksTag = "screen_show_only_ticks";
 
     // Block Filter
     private FilteringBehaviour filteringBehaviour;
@@ -117,9 +119,19 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         return targetBlock.getStateDefinition().getProperties();
     }
 
-    protected boolean detectPropsAndValues() {
-        return (!targetProperty.equals(DONT_DETECT) && !targetProperty.equals(CANT_DETECT)) ||
-                (!targetValue.equals(DONT_DETECT) && !targetValue.equals(CANT_DETECT));
+    protected boolean shouldDetectProps() {
+        return !targetProperty.equals(DONT_DETECT) && !targetProperty.equals(CANT_DETECT);
+    }
+
+    // Logs
+    protected void logBeValues() {
+        dl("All BlockEntity values:");
+        dl(" - targetBlock: " + BuiltInRegistries.BLOCK.getKey(targetBlock).getNamespace() + ":" + BuiltInRegistries.BLOCK.getKey(targetBlock).getPath());
+        dl(" - targetProperty: " + targetProperty);
+        dl(" - targetValue: " + targetValue);
+        dl(" - detectMode: " + detectMode);
+        dl(" - onForTicks: " + onForTicks);
+        dl(" - previousBlockInFront: " + BuiltInRegistries.BLOCK.getKey(previousBlockInFront).getNamespace() + ":" + BuiltInRegistries.BLOCK.getKey(previousBlockInFront).getPath());
     }
 
 
