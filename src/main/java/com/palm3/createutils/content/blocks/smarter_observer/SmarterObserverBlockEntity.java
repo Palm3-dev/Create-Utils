@@ -11,9 +11,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -43,9 +45,11 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     private static final String detectModeTag = "detect_mode";
     public Integer onForTicks = 2;  // Should be 1 redstone tick, i think? Used by screen to know (when block placed for the first time) what to put in scroll input.
     private static final String onForTicksTag = "on_for_ticks";
-    public Block previousBlockInFront = Blocks.AIR;
-    private static final String previousBlockInFrontTag = "prev_block_front";
-    public String blockRemovedDetectingPropsBh = BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS;
+    //public Block previousBlockInFront = Blocks.AIR;
+    //private static final String previousBlockInFrontTag = "prev_block_front";
+    public BlockState previousBlockStateInFront = Blocks.AIR.defaultBlockState();
+    private static final String previousBlockStateInFrontTag = "prev_block_state_in_front";
+    public String blockRemovedDetectingPropsBh = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;
     // bh -> behaviour. Default to this since at first startup no properties are selected, always.
     private static final String blockRemovedDetectingPropsBhTag = "block_rem_detect_props_bh";
 
@@ -82,9 +86,11 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
             if (getTargetBlockProps().isEmpty()) {  // No props and thus values.
                 targetProperty = SelectionRepresenter.CANT_DETECT;
                 targetValue = SelectionRepresenter.CANT_DETECT;
+                blockRemovedDetectingPropsBh = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;
             } else {
                 targetProperty = SelectionRepresenter.DONT_DETECT;
                 targetValue = SelectionRepresenter.DONT_DETECT;
+                blockRemovedDetectingPropsBh = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;
             }
             if (CUCommonConfig.LOG_ALL.getAsBoolean()) CUMain.LOGGER.info("Selected filter: {}", Block.byItem(is.getItem()));
             this.setChanged();
@@ -100,7 +106,10 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         tag.putString(targetValue_Tag, targetValue);
         tag.putString(detectModeTag, detectMode);
         tag.putInt(onForTicksTag, onForTicks);
-        tag.putString(previousBlockInFrontTag, blockToString(previousBlockInFront));
+        //tag.putString(previousBlockInFrontTag, blockToString(previousBlockInFront));
+        BlockState.CODEC.encodeStart(NbtOps.INSTANCE, previousBlockStateInFront)
+                        .result()
+                        .ifPresent(blockStateTag -> tag.put(previousBlockStateInFrontTag, blockStateTag));
         tag.putString(blockRemovedDetectingPropsBhTag, blockRemovedDetectingPropsBh);
         // Screen settings
         tag.putBoolean(showOnlyTicksTag, showOnlyTicks);
@@ -114,7 +123,12 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         this.targetValue = tag.getString(targetValue_Tag);
         this.detectMode = tag.getString(detectModeTag);
         this.onForTicks = tag.getInt(onForTicksTag);
-        this.previousBlockInFront = stringToBlock(tag.getString(previousBlockInFrontTag));
+        //this.previousBlockInFront = stringToBlock(tag.getString(previousBlockInFrontTag));
+        if (tag.contains(previousBlockStateInFrontTag)) {
+            this.previousBlockStateInFront = BlockState.CODEC.parse(NbtOps.INSTANCE, tag.get(previousBlockStateInFrontTag))
+                    .result()
+                    .orElseThrow();
+        } else throw new IllegalStateException("The CompoundTag doesn't contain the tag key previousBlockStateInFrontTag");
         this.blockRemovedDetectingPropsBh = tag.getString(blockRemovedDetectingPropsBhTag);
         // Screen settings
         this.showOnlyTicks = tag.getBoolean(showOnlyTicksTag);
@@ -122,6 +136,14 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
 
     protected Collection<Property<?>> getTargetBlockProps() {
         return targetBlock.getStateDefinition().getProperties();
+    }
+
+    protected Block getPreviousBlockInFront() {
+        return previousBlockStateInFront.getBlock();
+    }
+
+    protected void setPreviousBlockInFront(LevelAccessor level, BlockPos pos) {
+        previousBlockStateInFront = level.getBlockState(pos);
     }
 
     protected boolean shouldDetectProps() {
@@ -136,7 +158,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         dl(" - targetValue: " + targetValue);
         dl(" - detectMode: " + detectMode);
         dl(" - onForTicks: " + onForTicks);
-        dl(" - previousBlockInFront: " + BuiltInRegistries.BLOCK.getKey(previousBlockInFront).getNamespace() + ":" + BuiltInRegistries.BLOCK.getKey(previousBlockInFront).getPath());
+        dl(" - previousBlockInFront: " + BuiltInRegistries.BLOCK.getKey(getPreviousBlockInFront()).getNamespace() + ":" + BuiltInRegistries.BLOCK.getKey(getPreviousBlockInFront()).getPath());
+        dl(" - previousBlockStateInFront: " + previousBlockStateInFront);
     }
 
 
