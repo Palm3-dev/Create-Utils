@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SOSettingsRepresenter {
 
     // Used for screen and also block for checking matching props.
-    protected static class SelectionRepresenter {
+    protected static class PropertiesRepresenter {
         public static final String DONT_DETECT = "internal_detect_disabled";
         public static final String CANT_DETECT = "internal_cannot_detect";
         public static final String NOT_SET = "internal_still_not_set";
@@ -29,7 +29,7 @@ public class SOSettingsRepresenter {
         public final boolean hasProperties;
 
 
-        public SelectionRepresenter(Collection<Property<?>> targetBlockProperties) {
+        public PropertiesRepresenter(Collection<Property<?>> targetBlockProperties) {
             hasProperties = !targetBlockProperties.isEmpty();
             if (!hasProperties) {
                 // Only fill with CANT_DETECT since there are no properties.

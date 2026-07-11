@@ -4,14 +4,12 @@ import com.palm3.createutils.CUMain;
 import com.palm3.createutils.config.CUCommonConfig;
 import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.BRDPBhRepresenter;
 import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.DetectModeRepresenter;
-import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.SelectionRepresenter;
+import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.PropertiesRepresenter;
 import com.palm3.createutils.register.CUBlockEntities;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.redstone.DirectedDirectionalBlock;
 import com.simibubi.create.foundation.block.IBE;
-import com.simibubi.create.infrastructure.gametest.GameTestGroup;
-import jdk.jfr.Description;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,7 +42,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -216,7 +213,7 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
             if (be instanceof SmarterObserverBlockEntity sobe) {
                 Block changedBlock = changedState.getBlock();
                 Collection<Property<?>> changedBlockProps = changedBlock.getStateDefinition().getProperties();
-                SelectionRepresenter changedB = new SelectionRepresenter(changedBlockProps);
+                PropertiesRepresenter changedB = new PropertiesRepresenter(changedBlockProps);
 
                 if (sobe.targetBlock == null) throw new IllegalStateException("Target block (from BE) is null!");
 
@@ -267,7 +264,7 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
                                             }
                                             case BRDPBhRepresenter.DETECT_ONLY_PROPS -> {
                                                 dl("Changed block is air AND previous is target (removed), now checking previous props");
-                                                SelectionRepresenter sr = new SelectionRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
+                                                PropertiesRepresenter sr = new PropertiesRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
                                                 if (sr.hasProp(sobe.targetProperty) && sr.hasPValue(sobe.targetProperty, sobe.targetValue)) {
                                                     dl("Previous block contains target prop and prop value (doesn't mean it's in the correct state, only that it could have the values!)");
                                                     if (sobe.previousBlockStateInFront.getValue(sr.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) {

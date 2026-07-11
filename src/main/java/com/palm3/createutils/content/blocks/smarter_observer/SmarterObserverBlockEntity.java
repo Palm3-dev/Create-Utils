@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 
 import static com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock.dl;
-import static com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.SelectionRepresenter.*;
+import static com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.PropertiesRepresenter.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
@@ -35,9 +35,9 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     // Filtering targets
     public Block targetBlock = Blocks.AIR;  // Default to air (no filter). Has no properties.
     private static final String targetBlock_Tag = "target_block";
-    public String targetProperty = SelectionRepresenter.NOT_SET;  // Set with target block
+    public String targetProperty = PropertiesRepresenter.NOT_SET;  // Set with target block
     private static final String targetProperty_Tag = "target_property";
-    public String targetValue = SelectionRepresenter.NOT_SET;  // Set with target block
+    public String targetValue = PropertiesRepresenter.NOT_SET;  // Set with target block
     private static final String targetValue_Tag = "target_prop_value";
 
     // Behaviour settings
@@ -84,12 +84,12 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
             targetBlock = Block.byItem(is.getItem());
             // Initialization of vars for the screen, needed to set the scroll values at first startup.
             if (getTargetBlockProps().isEmpty()) {  // No props and thus values.
-                targetProperty = SelectionRepresenter.CANT_DETECT;
-                targetValue = SelectionRepresenter.CANT_DETECT;
+                targetProperty = PropertiesRepresenter.CANT_DETECT;
+                targetValue = PropertiesRepresenter.CANT_DETECT;
                 blockRemovedDetectingPropsBh = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;
             } else {
-                targetProperty = SelectionRepresenter.DONT_DETECT;
-                targetValue = SelectionRepresenter.DONT_DETECT;
+                targetProperty = PropertiesRepresenter.DONT_DETECT;
+                targetValue = PropertiesRepresenter.DONT_DETECT;
                 blockRemovedDetectingPropsBh = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;
             }
             if (CUCommonConfig.LOG_ALL.getAsBoolean()) CUMain.LOGGER.info("Selected filter: {}", Block.byItem(is.getItem()));
@@ -142,8 +142,8 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         return previousBlockStateInFront.getBlock();
     }
 
-    protected void setPreviousBlockInFront(LevelAccessor level, BlockPos pos) {
-        previousBlockStateInFront = level.getBlockState(pos);
+    protected void setPreviousBlockStateInFront(LevelAccessor level, BlockPos posInFront) {
+        previousBlockStateInFront = level.getBlockState(posInFront);
     }
 
     protected boolean shouldDetectProps() {

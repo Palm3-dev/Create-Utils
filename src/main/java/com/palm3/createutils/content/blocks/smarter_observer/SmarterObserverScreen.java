@@ -36,7 +36,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
     private String selectedBRDPBh;
 
     // To get all the properties/values.
-    private final SelectionRepresenter sr;
+    private final PropertiesRepresenter sr;
 
     // ScrollInput
     private ScrollInput targetValueSetter;  // ScrollInput to choose the property value to detect.
@@ -79,7 +79,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         selectedOnForTicks = currentOnForTicks;
         selectedBRDPBh = currentBRDPBh;
 
-        sr = new SelectionRepresenter(sobe.getTargetBlockProps());
+        sr = new PropertiesRepresenter(sobe.getTargetBlockProps());
     }
 
     @Override
@@ -114,7 +114,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                     if (i == 0) {  // Detect disabled.
                         targetValueSetter.withRange(0, 1);  // If no property, cannot change the value.
                         targetValueSetter.setState(0);  // If no property to detect, you can't detect a value, am i right?
-                        selectedTargetValue = SelectionRepresenter.DONT_DETECT;  // Set to don't detect, not updated automatically after setState(0).
+                        selectedTargetValue = PropertiesRepresenter.DONT_DETECT;  // Set to don't detect, not updated automatically after setState(0).
 
                         // Update BRDPBh button, no props selected
                         blockRemovedDetectingPropsSetter.setIcon(BRDPBhRepresenter.getIcon(BRDPBhRepresenter.LOCKED_FOR_NO_PROPS));
@@ -243,7 +243,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         // Current target property
         graphics.drawString(
                 font,
-                SelectionRepresenter.checkAndTranslateStatics(selectedTargetProperty),
+                PropertiesRepresenter.checkAndTranslateStatics(selectedTargetProperty),
                 x + 23,
                 y + 27,
                 0xFCFCEB,
@@ -253,7 +253,7 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
         // Current target value
         graphics.drawString(
                 font,
-                SelectionRepresenter.checkAndTranslateStatics(selectedTargetValue),
+                PropertiesRepresenter.checkAndTranslateStatics(selectedTargetValue),
                 x + 23,
                 y + 53,
                 0xFCFCEB,
