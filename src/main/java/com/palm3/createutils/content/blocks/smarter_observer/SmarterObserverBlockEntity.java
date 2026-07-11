@@ -150,6 +150,10 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
         return !targetProperty.equals(DONT_DETECT) && !targetProperty.equals(CANT_DETECT);
     }
 
+    protected boolean shouldDetectValues() {
+        return !targetValue.equals(DONT_DETECT) && !targetValue.equals(CANT_DETECT);
+    }
+
     // Logs
     protected void logBeValues() {
         dl("All BlockEntity values:");
