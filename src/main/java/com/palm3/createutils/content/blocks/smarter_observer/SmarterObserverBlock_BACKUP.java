@@ -338,6 +338,10 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
         BlockAction() {}
     }
 
+    /**
+     * @deprecated Not correctly implemented in this class.
+     */
+    @Deprecated
     protected @NotNull BlockAction getBlockActionAndUpdatePreviousBS(Block changedBlock, BlockPos changedBlockPos, SmarterObserverBlockEntity sobe, LevelAccessor level) {
         BlockAction blockAction;
         // Block removed
