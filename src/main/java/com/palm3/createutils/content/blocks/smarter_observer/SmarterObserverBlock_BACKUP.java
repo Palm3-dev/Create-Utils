@@ -10,6 +10,8 @@ import com.simibubi.create.AllItems;
 import com.simibubi.create.content.equipment.wrench.IWrenchable;
 import com.simibubi.create.content.redstone.DirectedDirectionalBlock;
 import com.simibubi.create.foundation.block.IBE;
+import com.simibubi.create.infrastructure.gametest.GameTestGroup;
+import jdk.jfr.Description;
 import net.createmod.catnip.gui.ScreenOpener;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -42,11 +44,16 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.TestOnly;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
 
+/**
+ * @deprecated Class is deprecated since it's a backup of {@link SmarterObserverBlock} done to avoid having to rollback from GitHub multiple commits behind.
+ */
+@Deprecated
 @ParametersAreNonnullByDefault
 public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implements EntityBlock, IBE<SmarterObserverBlockEntity> {
 
