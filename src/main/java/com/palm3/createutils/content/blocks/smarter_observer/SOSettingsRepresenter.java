@@ -187,7 +187,7 @@ public class SOSettingsRepresenter {
         }
     }
 
-    protected static class BlockRemovedDetectingPropsBhRepresenter {
+    protected static class BRDPBhRepresenter {
         // Representer of the behaviour of the observer if a block is removed while detecting the properties & values. Either detect it or skip and detect properties only.
         public static final String DETECT_ONLY_PROPS = "detect_only_props";  // If block changes without having correct properties/values, skip.
         public static final String DETECT_BLOCK_CHANGE = "detect_block_change";  // If block changes without having correct properties/values, detect.

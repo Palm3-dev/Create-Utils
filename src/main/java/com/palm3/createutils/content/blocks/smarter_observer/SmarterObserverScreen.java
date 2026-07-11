@@ -107,9 +107,9 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                     targetValueSetter.setState(1);
 
                     // Update BRDPBh button, now can be set and changes icon,
-                    blockRemovedDetectingPropsSetter.setIcon(BlockRemovedDetectingPropsBhRepresenter.getIcon(BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS));
-                    blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS));
-                    selectedBRDPBh = BlockRemovedDetectingPropsBhRepresenter.DETECT_ONLY_PROPS;
+                    blockRemovedDetectingPropsSetter.setIcon(BRDPBhRepresenter.getIcon(BRDPBhRepresenter.DETECT_ONLY_PROPS));
+                    blockRemovedDetectingPropsSetter.setToolTip(BRDPBhRepresenter.getTooltip(BRDPBhRepresenter.DETECT_ONLY_PROPS));
+                    selectedBRDPBh = BRDPBhRepresenter.DETECT_ONLY_PROPS;
 
                     if (i == 0) {  // Detect disabled.
                         targetValueSetter.withRange(0, 1);  // If no property, cannot change the value.
@@ -117,9 +117,9 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
                         selectedTargetValue = SelectionRepresenter.DONT_DETECT;  // Set to don't detect, not updated automatically after setState(0).
 
                         // Update BRDPBh button, no props selected
-                        blockRemovedDetectingPropsSetter.setIcon(BlockRemovedDetectingPropsBhRepresenter.getIcon(BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS));
-                        blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS));
-                        selectedBRDPBh = BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS;
+                        blockRemovedDetectingPropsSetter.setIcon(BRDPBhRepresenter.getIcon(BRDPBhRepresenter.LOCKED_FOR_NO_PROPS));
+                        blockRemovedDetectingPropsSetter.setToolTip(BRDPBhRepresenter.getTooltip(BRDPBhRepresenter.LOCKED_FOR_NO_PROPS));
+                        selectedBRDPBh = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;
                     }
                 })
                 .withStepFunction(sc -> 1)
@@ -176,13 +176,13 @@ public class SmarterObserverScreen extends AbstractSimiScreen {
             detectModeSetter.setToolTip(DetectModeRepresenter.getTooltip(selectedDetectMode));
         });
 
-        blockRemovedDetectingPropsSetter = new IconButton(x + 96, y + 105, BlockRemovedDetectingPropsBhRepresenter.getIcon(currentBRDPBh));
-        blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(currentBRDPBh));
+        blockRemovedDetectingPropsSetter = new IconButton(x + 96, y + 105, BRDPBhRepresenter.getIcon(currentBRDPBh));
+        blockRemovedDetectingPropsSetter.setToolTip(BRDPBhRepresenter.getTooltip(currentBRDPBh));
         blockRemovedDetectingPropsSetter.withCallback(() -> {
-            if (!selectedBRDPBh.equals(BlockRemovedDetectingPropsBhRepresenter.LOCKED_FOR_NO_PROPS)) {
-                selectedBRDPBh = BlockRemovedDetectingPropsBhRepresenter.getNext(selectedBRDPBh);
-                blockRemovedDetectingPropsSetter.setIcon(BlockRemovedDetectingPropsBhRepresenter.getIcon(selectedBRDPBh));
-                blockRemovedDetectingPropsSetter.setToolTip(BlockRemovedDetectingPropsBhRepresenter.getTooltip(selectedBRDPBh));
+            if (!selectedBRDPBh.equals(BRDPBhRepresenter.LOCKED_FOR_NO_PROPS)) {
+                selectedBRDPBh = BRDPBhRepresenter.getNext(selectedBRDPBh);
+                blockRemovedDetectingPropsSetter.setIcon(BRDPBhRepresenter.getIcon(selectedBRDPBh));
+                blockRemovedDetectingPropsSetter.setToolTip(BRDPBhRepresenter.getTooltip(selectedBRDPBh));
             }
         });
 
