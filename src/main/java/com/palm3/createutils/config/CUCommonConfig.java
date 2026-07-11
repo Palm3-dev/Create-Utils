@@ -7,6 +7,7 @@ public class CUCommonConfig {
 
     // Logging
     public static final ModConfigSpec.BooleanValue LOG_ALL;
+    public static final ModConfigSpec.BooleanValue LOG_SMARTER_OBSERVER;
 
     // Smarter Observer
     public static final ModConfigSpec.IntValue MAX_ON_FOR_TICKS;
@@ -17,8 +18,12 @@ public class CUCommonConfig {
         //------------ Logging ------------
         builder.push("Logging");
         LOG_ALL = builder
-                .comment("If enabled, all log infos will be printed.")
-                .define("Extensive Logging", false);
+                .comment("If enabled, all log infos (for all blocks) will be printed.")
+                .define("Log all", false);
+
+        LOG_SMARTER_OBSERVER = builder
+                .comment("If enabled, smarter observer related logs will be printed.")
+                        .define("Smarter Observer", false);
 
         builder.pop();
 
