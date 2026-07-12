@@ -23,12 +23,11 @@ public class CUCommonConfig {
 
         LOG_SMARTER_OBSERVER = builder
                 .comment("If enabled, smarter observer related logs will be printed.")
-                        .define("Smarter Observer", false);
+                .define("Smarter Observer", false);
 
         builder.pop();
 
         //------------ Smarter observer ----------
-
         builder.push("Smarter Observer");
         MAX_ON_FOR_TICKS = builder
                 .comment("The max number of game ticks the observer should remain powered after detecting a block. 1s = 20tick, 1min = 1200tick, 1h = 72000tick")
@@ -37,5 +36,13 @@ public class CUCommonConfig {
         builder.pop();
 
         COMMON_CONFIG = builder.build();
+    }
+
+    // Logging utils
+    public static boolean logAll() {
+        return LOG_ALL.getAsBoolean();
+    }
+    public static boolean logSmarterObserver() {
+        return LOG_ALL.getAsBoolean() || LOG_SMARTER_OBSERVER.getAsBoolean();
     }
 }
