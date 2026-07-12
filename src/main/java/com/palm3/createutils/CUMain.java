@@ -2,6 +2,7 @@ package com.palm3.createutils;
 
 import com.mojang.logging.LogUtils;
 import com.palm3.createutils.config.CUCommonConfig;
+import com.palm3.createutils.foundation.block_items_addition.NonexistingBlockItemCreator;
 import com.palm3.createutils.register.*;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import net.minecraft.resources.ResourceKey;
@@ -24,6 +25,9 @@ public class CUMain {
         CU_REGISTRATE.registerEventListeners(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, CUCommonConfig.COMMON_CONFIG);
+
+
+
 
         CUPackets.register();
         CUBlocks.register();

@@ -54,7 +54,7 @@ public class SmarterObserverPacket extends BlockEntityConfigurationPacket<Smarte
         sobe.targetValue = targetValue;
         sobe.detectMode = detectMode;
         sobe.onForTicks = onForTicks;
-        sobe.blockRemovedDetectingPropsBh = blockRemovedDetectingPropsBh;
+        sobe.blockRemovedDetectingPropsBehaviour = blockRemovedDetectingPropsBh;
         sobe.showOnlyTicks = showOnlyTicks;
         sobe.setChanged();
     }

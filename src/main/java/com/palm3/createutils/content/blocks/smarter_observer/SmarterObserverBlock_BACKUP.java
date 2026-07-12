@@ -2,7 +2,7 @@ package com.palm3.createutils.content.blocks.smarter_observer;
 
 import com.palm3.createutils.CUMain;
 import com.palm3.createutils.config.CUCommonConfig;
-import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.BRDPBhRepresenter;
+import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.BlockRemovedDetectingPropsBehavioursRepresenter;
 import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.DetectModeRepresenter;
 import com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.PropertiesRepresenter;
 import com.palm3.createutils.register.CUBlockEntities;
@@ -219,7 +219,7 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
 
                 dl("");
                 dl("");
-                sobe.logBeValues();
+                //sobe.logBeValues();  // non existing anymore
 
                 switch (sobe.detectMode) {
                     // BOTH
@@ -235,7 +235,7 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
                         else {
                             dl("Target block specified [" + getBName(sobe.targetBlock) + "]");
 
-                            if (!sobe.shouldDetectProps()) {
+                            if (!sobe.hasTargetProperty()) {
                                 dl("Target block has no props OR no selected property to filter.");
                                 if (changedBlock != sobe.getPreviousBlockInFront()) {
                                     dl("Changed block isn't the same as the previous (not a property change)");
@@ -251,18 +251,18 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
 
                             else {
 
-                                if (sobe.shouldDetectValues()) {
+                                if (sobe.hasTargetValue()) {
                                     dl("Target block has selected properties and values to filter.");
                                     if (changedBlock == Blocks.AIR && sobe.getPreviousBlockInFront() == sobe.targetBlock) {
-                                        switch (sobe.blockRemovedDetectingPropsBh) {
-                                            case BRDPBhRepresenter.DETECT_BLOCK_CHANGE -> {
+                                        switch (sobe.blockRemovedDetectingPropsBehaviour) {
+                                            case BlockRemovedDetectingPropsBehavioursRepresenter.DETECT_BLOCK_CHANGE -> {
                                                 dl("Changed block is air AND previous is target (removed), no previous props to check, STARTING signal");
                                                 sobe.setPreviousBlockStateInFront(level, changedPos);
                                                 dl("Saved new currently placed block [" + getBName(changedBlock) + "] in BE in previousBlockInFront");
                                                 this.startSignal(level, thisBlockPos);
 
                                             }
-                                            case BRDPBhRepresenter.DETECT_ONLY_PROPS -> {
+                                            case BlockRemovedDetectingPropsBehavioursRepresenter.DETECT_ONLY_PROPS -> {
                                                 dl("Changed block is air AND previous is target (removed), now checking previous props");
                                                 PropertiesRepresenter sr = new PropertiesRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
                                                 if (sr.hasProp(sobe.targetProperty) && sr.hasPValue(sobe.targetProperty, sobe.targetValue)) {
@@ -276,8 +276,8 @@ public class SmarterObserverBlock_BACKUP extends DirectedDirectionalBlock implem
                                                 dl("Saved new currently placed block [" + getBName(changedBlock) + "] in BE in previousBlockInFront");
 
                                             }
-                                            case BRDPBhRepresenter.LOCKED_FOR_NO_PROPS -> throw new IllegalStateException(BRDPBhRepresenter.LOCKED_FOR_NO_PROPS + " Shouldn't reach here!");
-                                            default -> throw new IllegalStateException("The BE value of blockRemovedDetectingPropsBh [" + sobe.blockRemovedDetectingPropsBh + "] doesn't exist!");
+                                            case SOSettingsRepresenter.BlockRemovedDetectingPropsBehavioursRepresenter.LOCKED_FOR_NO_PROPS -> throw new IllegalStateException(SOSettingsRepresenter.BlockRemovedDetectingPropsBehavioursRepresenter.LOCKED_FOR_NO_PROPS + " Shouldn't reach here!");
+                                            default -> throw new IllegalStateException("The BE value of blockRemovedDetectingPropsBehaviour [" + sobe.blockRemovedDetectingPropsBehaviour + "] doesn't exist!");
                                         }
                                     }
 

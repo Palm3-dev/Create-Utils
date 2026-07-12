@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
-import static com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock.dl;
 import static com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.PropertiesRepresenter.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -145,10 +144,12 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
      * Contains the possible property and relative property value states, such as {@link PropertiesRepresenter#DONT_DETECT}, {@link PropertiesRepresenter#CANT_DETECT}...
      */
     protected enum PropValuesStates {
-        TARGET_PROPERTY_AND_VALUE_NON_EXISTENT,  // Prop and value both CANT_DETECT, block has no props.
-        TARGET_PROPERTY_AND_VALUE_DISABLED,  // Prop and value are both DONT_DETECT, block has props but aren't selected.
-        TARGET_PROPERTY_ONLY_SET,  // Property set but not the value.
-        TARGET_PROPERTY_AND_VALUE_SET;
+        BOTH_NON_EXISTENT_AND_NO_TARGET_BLOCK,
+        BOTH_NON_EXISTENT,  // Target property and value non-existent.
+        BOTH_NOT_SELECTED,
+        ONLY_VALUE_SET,
+        ONLY_PROPERTY_SET,
+        BOTH_SELECTED;
 
         PropValuesStates() {}
     }
@@ -156,31 +157,41 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     /**
      * @return The current configuration of the property and property value as {@link PropValuesStates}. The actual values of the property/value are ignored.
      */
-    protected @NotNull SmarterObserverBlockEntity.PropValuesStates getPropAndValueState() {
-        PropValuesStates returnValue;
-        if (targetProperty.equals(CANT_DETECT) || targetValue.equals(CANT_DETECT))
-            returnValue = PropValuesStates.TARGET_PROPERTY_AND_VALUE_NON_EXISTENT;
-        else if (targetProperty.equals(DONT_DETECT) && targetValue.equals(DONT_DETECT))
-            returnValue = PropValuesStates.TARGET_PROPERTY_AND_VALUE_DISABLED;
-        else if (!targetProperty.equals(DONT_DETECT) && targetValue.equals(DONT_DETECT))
-            returnValue = PropValuesStates.TARGET_PROPERTY_ONLY_SET;
-        else if (!targetProperty.equals(DONT_DETECT))  //  && !targetValue.equals(DONT_DETECT)
-            returnValue = PropValuesStates.TARGET_PROPERTY_AND_VALUE_SET;
-        else throw new IllegalStateException("The targetProperty/targetValue values configuration cannot exist! Current values: " + targetProperty + " | " + targetValue);
-        return returnValue;
+    protected @NotNull SmarterObserverBlockEntity.PropValuesStates getTargetPropAndValueConfiguration() {
+        PropValuesStates propValuesStates;
+        if ((targetProperty.equals(CANT_DETECT) && !targetValue.equals(targetProperty)) || (targetValue.equals(CANT_DETECT) && !targetProperty.equals(targetValue)))
+            throw new IllegalStateException("Non-consistent target property and value configuration, both need to be CANT_DETECT if one of the two is. " +
+                    "Current values (prop, value): " + targetProperty + " | " + targetValue);
+
+        if (targetProperty.equals(NOT_SET) && targetBlock == Blocks.AIR) propValuesStates = PropValuesStates.BOTH_NON_EXISTENT_AND_NO_TARGET_BLOCK;
+        else if (targetProperty.equals(NOT_SET)) throw new IllegalStateException("Target block should be AIR if the property is NOT_SET.");
+        else if (targetProperty.equals(CANT_DETECT)) propValuesStates = PropValuesStates.BOTH_NON_EXISTENT;  // Also value is cant detect.
+        else if (targetProperty.equals(DONT_DETECT) && targetValue.equals(DONT_DETECT)) propValuesStates = PropValuesStates.BOTH_NOT_SELECTED;
+        else if (targetProperty.equals(DONT_DETECT)) propValuesStates = PropValuesStates.ONLY_VALUE_SET;
+        else if (targetValue.equals(DONT_DETECT)) propValuesStates = PropValuesStates.ONLY_PROPERTY_SET;
+        else propValuesStates = PropValuesStates.BOTH_SELECTED;
+
+        return propValuesStates;
     }
 
     /**
      * @return 'true' if the BE has the property filter set.
      */
-    protected boolean shouldDetectProps() {
+    protected boolean hasTargetProperty() {
         return !targetProperty.equals(DONT_DETECT) && !targetProperty.equals(CANT_DETECT);
     }
 
     /**
      * @return 'true' if the BE has the property value set.
      */
-    protected boolean shouldDetectValues() {
+    protected boolean hasTargetValue() {
         return !targetValue.equals(DONT_DETECT) && !targetValue.equals(CANT_DETECT);
+    }
+
+    /**
+     * @return 'true' if the BE has the property and the property value set.
+     */
+    protected boolean hasTargetPropAndValue() {
+        return hasTargetProperty() && hasTargetValue();
     }
 }

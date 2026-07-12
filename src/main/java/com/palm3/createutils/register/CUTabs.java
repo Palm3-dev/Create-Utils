@@ -15,10 +15,9 @@ public class CUTabs {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB = CU_TABS
             .register("main_creative_tab", () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.createutils.main_creative_tab"))
-                    .icon(() -> new ItemStack(Items.IRON_BLOCK.asItem()))
+                    .icon(() -> new ItemStack(CUBlocks.SMARTER_OBSERVER.asItem()))
                     .displayItems((params, output) -> {
-                        CUBlocks.SMARTER_OBSERVER.asItem();
-                        Items.STICK.asItem();
+                        output.accept(CUBlocks.SMARTER_OBSERVER.asItem());
                     })
                     .build()
             );

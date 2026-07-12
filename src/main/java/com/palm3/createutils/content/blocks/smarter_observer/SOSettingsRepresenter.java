@@ -9,10 +9,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@MethodsReturnNonnullByDefault
 public class SOSettingsRepresenter {
 
-    // Used for screen and also block for checking matching props.
+    /**
+     * Represents the blockstate properties and the relative values obtained from the given block properties as {@link Collection}
+     */
+    @MethodsReturnNonnullByDefault
     protected static class PropertiesRepresenter {
         public static final String DONT_DETECT = "internal_detect_disabled";
         public static final String CANT_DETECT = "internal_cannot_detect";
@@ -64,7 +66,7 @@ public class SOSettingsRepresenter {
                         valuesIndex.incrementAndGet();
                     });
 
-                    // Adding for the DONT_DETECT property the map of values (not automated in for loop).
+                    // Adding in the values by property for the DONT_DETECT property the map of values (not automated in for loop).
                     valuesByIndex_ByProp.put(DONT_DETECT, valuesByIndex);
                     valuesIndexesByValue_ByProp.put(DONT_DETECT, valuesIndexesByValue);
 
@@ -109,7 +111,7 @@ public class SOSettingsRepresenter {
             } else return 0;  // Only one value at index 0 for one property, CANT_DETECT.
         }
 
-        // If receives true, it ignores the DONT_DETECT property, otherwise also counted incrementing the total by one. This is done only if there are properties.
+        /// If receives true, it ignores the DONT_DETECT property, otherwise it's also counted incrementing the total by one. This is done only if there are properties.
         public Integer getPropsNumber(boolean onlyGetBlockProps) {
             if (hasProperties) {
                 if (onlyGetBlockProps) return propertiesByIndex.size() - 1;
@@ -117,7 +119,7 @@ public class SOSettingsRepresenter {
             } else return 1;  // There's only CANT_DETECT.
         }
 
-        // If receives true, it ignores the DONT_DETECT value, otherwise also counted incrementing the total by one. This is done only if there are properties.
+        /// If receives true, it ignores the DONT_DETECT value, otherwise it's also counted incrementing the total by one. This is done only if there are properties.
         public Integer getPValuesNumber(String correspondingProp, boolean onlyGetBlockPValues) {
             if (hasProperties) {
                 if (valuesByIndex_ByProp.get(correspondingProp) == null)
@@ -127,6 +129,7 @@ public class SOSettingsRepresenter {
             } else return 1;  // There's only one property with one value, CANT_DETECT.
         }
 
+        // Translation of static constants CANT_DETECT, DONT_DETECT, NOT_SET.
         public static Component checkAndTranslateStatics(String stringToCheck) {
             return switch (stringToCheck) {
                 case DONT_DETECT -> Component.translatable("gui.smarter_observer.internal_detect_disabled");
@@ -136,7 +139,6 @@ public class SOSettingsRepresenter {
             };
         }
 
-        // Used for controls, not for setting (usually).
         public boolean hasProp(String prop) {
             return propertiesByIndex.containsValue(prop);
         }
@@ -154,7 +156,17 @@ public class SOSettingsRepresenter {
         }
     }
 
-    protected static class DetectModeRepresenter {
+
+
+
+
+
+
+
+
+
+
+    protected static class DetectModeRepresenter {  // todo revise code here (DetectModeRepresenter)
         public static final String DETECT_PLACED = "detect_placed";
         public static final String DETECT_REMOVED = "detect_removed";
         public static final String DETECT_BOTH = "detect_both";
@@ -187,7 +199,8 @@ public class SOSettingsRepresenter {
         }
     }
 
-    protected static class BRDPBhRepresenter {
+
+    protected static class BlockRemovedDetectingPropsBehavioursRepresenter {// todo revise code here (BRDPBhRepresenter)
         // Representer of the behaviour of the observer if a block is removed while detecting the properties & values. Either detect it or skip and detect properties only.
         public static final String DETECT_ONLY_PROPS = "detect_only_props";  // If block changes without having correct properties/values, skip.
         public static final String DETECT_BLOCK_CHANGE = "detect_block_change";  // If block changes without having correct properties/values, detect.

@@ -40,12 +40,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.checkerframework.checker.units.qual.N;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
+
+
+import static com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock.BlockAction.*;
 
 @ParametersAreNonnullByDefault
 public class SmarterObserverBlock extends DirectedDirectionalBlock implements EntityBlock, IBE<SmarterObserverBlockEntity> {
@@ -209,10 +211,26 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
             if (be instanceof SmarterObserverBlockEntity sobe) {
                 Block changedBlock = changedState.getBlock();
                 Collection<Property<?>> changedBlockProps = changedBlock.getStateDefinition().getProperties();
-                SelectionRepresenter changedB = new SelectionRepresenter(changedBlockProps);
+                PropertiesRepresenter changedB = new PropertiesRepresenter(changedBlockProps);
 
                 if (sobe.targetBlock == null) throw new IllegalStateException("Target block (from BE) is null!");
 
+                dl("previous: " + sobe.getPreviousBlockInFront());
+                dl("target: " + sobe.targetBlock);
+
+                dl("  " + sobe.getTargetPropAndValueConfiguration());
+                dl(getBlockActionAndUpdatePreviousState(changedState, changedPos, sobe, level).toString());
+
+
+
+
+
+
+
+
+
+
+                /*
                 dl("");
                 dl("");
                 sobe.logBeValues();
@@ -250,7 +268,7 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
                                 if (sobe.shouldDetectValues()) {
                                     dl("Target block has selected properties and values to filter.");
                                     if (changedBlock == Blocks.AIR && sobe.getPreviousBlockInFront() == sobe.targetBlock) {
-                                        switch (sobe.blockRemovedDetectingPropsBh) {
+                                        switch (sobe.blockRemovedDetectingPropsBehaviour) {
                                             case BRDPBhRepresenter.DETECT_BLOCK_CHANGE -> {
                                                 dl("Changed block is air AND previous is target (removed), no previous props to check, STARTING signal");
                                                 sobe.setPreviousBlockStateInFront(level, changedPos);
@@ -260,7 +278,7 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
                                             }
                                             case BRDPBhRepresenter.DETECT_ONLY_PROPS -> {
                                                 dl("Changed block is air AND previous is target (removed), now checking previous props");
-                                                SelectionRepresenter sr = new SelectionRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
+                                                PropertiesRepresenter sr = new PropertiesRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
                                                 if (sr.hasProp(sobe.targetProperty) && sr.hasPValue(sobe.targetProperty, sobe.targetValue)) {
                                                     dl("Previous block contains target prop and prop value (doesn't mean it's in the correct state, only that it could have the values!)");
                                                     if (sobe.previousBlockStateInFront.getValue(sr.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) {
@@ -273,7 +291,7 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
 
                                             }
                                             case BRDPBhRepresenter.LOCKED_FOR_NO_PROPS -> throw new IllegalStateException(BRDPBhRepresenter.LOCKED_FOR_NO_PROPS + " Shouldn't reach here!");
-                                            default -> throw new IllegalStateException("The BE value of blockRemovedDetectingPropsBh [" + sobe.blockRemovedDetectingPropsBh + "] doesn't exist!");
+                                            default -> throw new IllegalStateException("The BE value of blockRemovedDetectingPropsBehaviour [" + sobe.blockRemovedDetectingPropsBehaviour + "] doesn't exist!");
                                         }
                                     }
 
@@ -312,46 +330,299 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
 
                     default ->
                             throw new IllegalStateException("The current BE setting 'detectMode' [" + sobe.detectMode + "] is invalid and should not exist!");
-                }
+                }*/
 
             } else throw new IllegalStateException("The BlockEntity at pos " + thisBlockPos + " is not a SmarterObserverBlockEntity!");
         }
 
-        return super.updateShape(state, changedDir, changedState, level, thisBlockPos, changedPos);  // No changes made here
+        return super.updateShape(state, changedDir, changedState, level, thisBlockPos, changedPos);  // No blockstate changes made
     }
 
     protected enum BlockAction {
-        TARGET_REMOVED,
-        TARGET_PLACED,
-        OTHER_REMOVED,
-        OTHER_PLACED,
-        TARGET_BLOCK_PROP_CHANGE,
-        OTHER_BLOCK_PROP_CHANGE;
+
+        TODO,
+        // Basic values, used in getBasicBlockAction()
+        GENERIC_BLOCK_PLACED,
+        GENERIC_BLOCK_REMOVED,
+        GENERIC_STATE_CHANGE,
+
+        // Other values, used in getBlockActionAndUpdatePreviousS()
+
+        // State change
+        TARGET_CHANGED_STATE,
+        OTHER_CHANGED_STATE,
+        STATE_CHANGED_NO_TARGET_BLOCK_NO_PROPS,
+
+        // Block actions with no property and value selected/detectable.
+        TARGET_PLACED_NO_PROPS,
+        OTHER_PLACED_NO_PROPS,
+        PLACED_NO_TARGET_BLOCK_NO_PROPS,
+        TARGET_REMOVED_NO_PROPS,
+        OTHER_REMOVED_NO_PROPS,
+        REMOVED_NO_TARGET_BLOCK_NO_PROPS,
+
+        // Block action with only property selected
+        TARGET_PLACED_MATCHING_PROPERTY,
+        TARGET_PLACED_PROPERTY_DOESNT_MATCH,
+        OTHER_PLACED_MATCHING_PROPERTY,
+        OTHER_PLACED_PROPERTY_DOESNT_MATCH,
+        OTHER_PLACED_HAS_NO_PROPS,
+        TARGET_REMOVED_MATCHING_PROPERTY,
+        TARGET_REMOVED_PROPERTY_DOESNT_MATCH,
+        OTHER_REMOVED_MATCHING_PROPERTY,
+        OTHER_REMOVED_PROPERTY_DOESNT_MATCH,
+        OTHER_REMOVED_HAS_NO_PROPS,
+
+        // Block action with property and its value selected.
+        TARGET_PLACED_MATCHING_BOTH,
+        OTHER_PLACED_MATCHING_BOTH
+        ;
 
         BlockAction() {}
     }
 
-    protected @NotNull BlockAction getBlockActionAndUpdatePreviousBS(Block changedBlock, BlockPos changedBlockPos, SmarterObserverBlockEntity sobe, LevelAccessor level) {
+
+    /**
+     * @param changedBlockState The {@link BlockState} that changed.
+     * @return if a block has been placed, removed or has changed state via {@link BlockAction} enum.
+     */
+    protected static @NotNull BlockAction getBasicBlockAction(BlockState changedBlockState, SmarterObserverBlockEntity sobe) {
+        if (changedBlockState.getBlock() == sobe.getPreviousBlockInFront()) return GENERIC_STATE_CHANGE;
+        else if (changedBlockState.getBlock() != Blocks.AIR) return BlockAction.GENERIC_BLOCK_PLACED;
+        else return BlockAction.GENERIC_BLOCK_REMOVED;
+    }
+
+    protected static @NotNull BlockAction getBlockActionAndUpdatePreviousState(BlockState changedBlockState, BlockPos changedBlockPos, SmarterObserverBlockEntity sobe, LevelAccessor level) {
         BlockAction blockAction;
+        Block changedBlock = changedBlockState.getBlock();
+
+        switch (sobe.getTargetPropAndValueConfiguration()) {
+            // Target block has no props or no prop has been selected.
+            case BOTH_NON_EXISTENT, BOTH_NOT_SELECTED, BOTH_NON_EXISTENT_AND_NO_TARGET_BLOCK -> {
+                switch (getBasicBlockAction(changedBlockState, sobe)) {
+                    case GENERIC_BLOCK_PLACED -> {
+                        if (sobe.hasTargetBlock()) {
+                            if (changedBlock == sobe.targetBlock) blockAction = TARGET_PLACED_NO_PROPS;
+                            else blockAction = OTHER_PLACED_NO_PROPS;
+                        } else blockAction = PLACED_NO_TARGET_BLOCK_NO_PROPS;
+                    }
+
+                    case GENERIC_BLOCK_REMOVED -> {
+                        if (sobe.hasTargetBlock()) {
+                            if (sobe.getPreviousBlockInFront() == sobe.targetBlock) blockAction = TARGET_REMOVED_NO_PROPS;
+                            else blockAction = OTHER_REMOVED_NO_PROPS;
+                        } else blockAction = REMOVED_NO_TARGET_BLOCK_NO_PROPS;
+                    }
+
+                    case GENERIC_STATE_CHANGE -> {
+                        if (sobe.hasTargetBlock()) {
+                            if (changedBlock == sobe.targetBlock) blockAction = TARGET_CHANGED_STATE;
+                            else blockAction = OTHER_CHANGED_STATE;
+                        } else blockAction = STATE_CHANGED_NO_TARGET_BLOCK_NO_PROPS;  // Basically is a vanilla observer if you use this condition.
+                    }
+
+                    default -> throw new IllegalStateException("Method getBasicBlockAction() returned non-handled values!");
+                }
+            }
+
+            // Target block has only the property selected.
+            case ONLY_PROPERTY_SET -> {
+                PropertiesRepresenter changedBlockProps = new PropertiesRepresenter(changedBlock.getStateDefinition().getProperties());
+                switch (getBasicBlockAction(changedBlockState, sobe)) {
+                    case GENERIC_BLOCK_PLACED -> {
+                        if (sobe.hasTargetBlock() && changedBlock == sobe.targetBlock) {
+                            if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) blockAction = TARGET_PLACED_MATCHING_PROPERTY;
+                            else blockAction = TARGET_PLACED_PROPERTY_DOESNT_MATCH;
+                        } else {                            
+                            if (changedBlockProps.hasProperties) {
+                                if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) blockAction = OTHER_PLACED_MATCHING_PROPERTY;
+                                else blockAction = OTHER_PLACED_PROPERTY_DOESNT_MATCH;
+                            } else blockAction = OTHER_PLACED_HAS_NO_PROPS;                            
+                        }
+                    }
+
+                    case GENERIC_BLOCK_REMOVED -> {
+                        if (sobe.hasTargetBlock() && sobe.getPreviousBlockInFront() == sobe.targetBlock) {
+                            if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) blockAction = TARGET_REMOVED_MATCHING_PROPERTY;
+                            else blockAction = TARGET_REMOVED_PROPERTY_DOESNT_MATCH;
+                        } else {
+                            if (changedBlockProps.hasProperties) {
+                                if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) blockAction = OTHER_REMOVED_MATCHING_PROPERTY;
+                                else blockAction = OTHER_REMOVED_PROPERTY_DOESNT_MATCH;
+                            } else blockAction = OTHER_REMOVED_HAS_NO_PROPS;
+                        }
+                    }
+
+                    case GENERIC_STATE_CHANGE -> {
+                        if (sobe.hasTargetBlock()) {
+                            if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) blockAction = TARGET_CHANGED_STATE;
+                            else blockAction = TARGET_REMOVED_PROPERTY_DOESNT_MATCH;
+                        } else {
+                            if (changedBlockProps.hasProperties) {
+                                if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) blockAction = OTHER_REMOVED_MATCHING_PROPERTY;
+                                else blockAction = OTHER_REMOVED_PROPERTY_DOESNT_MATCH;
+                            } else blockAction = OTHER_REMOVED_HAS_NO_PROPS;
+                        }
+                    }
+
+                    default -> throw new IllegalStateException("Method getBasicBlockAction() returned non-handled values!");
+                }
+            }
+
+            case ONLY_VALUE_SET -> throw new IllegalStateException("Cannot detect value without having the property! Impossible state!");
+
+            // Target value and property are selected.
+            case BOTH_SELECTED -> {
+                PropertiesRepresenter changedBlockProps = new PropertiesRepresenter(changedBlock.getStateDefinition().getProperties());
+                switch (getBasicBlockAction(changedBlockState, sobe)) {
+                    case GENERIC_BLOCK_PLACED -> {
+                        if (sobe.hasTargetBlock() && changedBlock == sobe.targetBlock) {
+                            if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) {
+                                if (changedBlockState.getValue(changedBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) blockAction = TARGET_PLACED_MATCHING_BOTH;
+                                else blockAction = TARGET_PLACED_MATCHING_PROPERTY;
+                            } else blockAction = TARGET_PLACED_PROPERTY_DOESNT_MATCH;
+                        } else {
+                            if (changedBlockProps.hasProperties) {
+                                if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) {
+                                    if (changedBlockState.getValue(changedBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) blockAction = OTHER_PLACED_MATCHING_BOTH;
+                                    else blockAction = OTHER_PLACED_MATCHING_PROPERTY;
+                                } else blockAction = OTHER_PLACED_PROPERTY_DOESNT_MATCH;
+                            } else blockAction = OTHER_PLACED_HAS_NO_PROPS;
+                        }
+                    }
+
+                    case GENERIC_BLOCK_REMOVED -> {
+                        if (sobe.hasTargetBlock() && sobe.getPreviousBlockInFront() == sobe.targetBlock) {
+                            if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) {
+                                if (changedBlockState.getValue(changedBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) blockAction = TARGET_PLACED_MATCHING_BOTH;
+                                else blockAction = TARGET_PLACED_MATCHING_PROPERTY;
+                            } else blockAction = TARGET_PLACED_PROPERTY_DOESNT_MATCH;
+                        } else {
+                            if (changedBlockProps.hasProperties) {
+                                if (changedBlockState.getProperties().contains(changedBlockProps.getProp(sobe.targetProperty))) {
+                                    if (changedBlockState.getValue(changedBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) blockAction = OTHER_PLACED_MATCHING_BOTH;
+                                    else blockAction = OTHER_PLACED_MATCHING_PROPERTY;
+                                } else blockAction = OTHER_PLACED_PROPERTY_DOESNT_MATCH;
+                            } else blockAction = OTHER_PLACED_HAS_NO_PROPS;
+                        }
+                    }
+
+                    case GENERIC_STATE_CHANGE -> blockAction = TODO;
+
+                    default -> throw new IllegalStateException("Method getBasicBlockAction() returned non-handled values!");
+                }
+            }
+
+            default -> throw new IllegalStateException("Method SmarterObserverBlockEntity.getTargetPropAndValueConfiguration() returned non-handled values!");
+        }
+
+        /*
+        // We have target block.
+        if (sobe.hasTargetBlock()) {
+
+        }
+
+        // We don't have specified target block (detect only the property).
+        else {
+            PropertiesRepresenter changedBlockProps = new PropertiesRepresenter(changedBlock.getStateDefinition().getProperties());
+            swi
+        }*/
+
+        // Update to new changed blockstate if changed.
+        if (changedBlockState != sobe.previousBlockStateInFront) sobe.setPreviousBlockStateInFront(level, changedBlockPos);
+        return blockAction;
+    }
+
+
+
+    /*protected enum BlockAction {
+        // Removed
+        TARGET_REMOVED_PROPS_DONT_MATCH,  // Target block is removed and its properties WEREN'T matching target ones.
+        TARGET_REMOVED_MATCHING_PROPS,  // Target block is removed WERE matching target ones.
+        TARGET_REMOVED_HAS_NO_PROPS,  // Target block is removed and it has no props.
+        OTHER_REMOVED_PROPS_DONT_MATCH,  // Other block is removed and its properties WEREN'T matching the target ones.
+        OTHER_REMOVED_MATCHING_PROPS,  // Other block is removed and its properties WERE matching the target ones.
+        OTHER_REMOVED_HAS_NO_PROPS,  // Other block is removed and it has no props.
+        // Placed
+        TARGET_PLACED_PROPS_DONT_MATCH,  // Target block is placed and the properties DON'T MATCH the target ones.
+        TARGET_PLACED_MATCHING_PROPS,  // Target block is placed and the properties MATCH the target ones.
+        TARGET_PLACED_HAS_NO_PROPS,  // Target block is placed and has no properties.
+        OTHER_PLACED_PROPS_DONT_MATCH,  // Other block is placed and the properties DON'T MATCH the target ones.
+        OTHER_PLACED_MATCHING_PROPS,  // Other block is placed and the properties MATCH the target ones.
+        OTHER_PLACED_HAS_NO_PROPS,  // Other block is placed and has no properties.
+        BLOCK_PLACED_NO_TARGET_BLOCK_SELECTED,  // We don't know if block is target or not since there's no block filter.
+        // State change
+        TARGET_BLOCK_PROP_CHANGE,  // Changed block IS the target and a/more property value changed. Same Block as before though.
+        OTHER_BLOCK_PROP_CHANGE;  // Changed block ISN'T the target and a/more property value changed. Same Block as before though.
+
+        BlockAction() {}
+    }*/
+
+
+
+    /*
+    protected static @NotNull BlockAction getBlockActionAndUpdatePreviousBS(BlockState changedBlockState, BlockPos changedBlockPos, SmarterObserverBlockEntity sobe, LevelAccessor level) {
+        BlockAction blockAction;
+        Block changedBlock = changedBlockState.getBlock();
+
         // Block removed
         if (changedBlock == Blocks.AIR) {
-            if (sobe.getPreviousBlockInFront() == sobe.targetBlock) blockAction = BlockAction.TARGET_REMOVED;
-            if (sobe.getPreviousBlockInFront() != sobe.targetBlock) blockAction = BlockAction.OTHER_REMOVED;
+            PropertiesRepresenter previousBlockProps = new PropertiesRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
+            if (sobe.getPreviousBlockInFront() == sobe.targetBlock) {
+                if (previousBlockProps.hasProperties) {
+                    if (sobe.previousBlockStateInFront.getValue(previousBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue))
+                        blockAction = BlockAction.TARGET_REMOVED_MATCHING_PROPS;
+                    else blockAction = BlockAction.TARGET_REMOVED_PROPS_DONT_MATCH;
+                } else {
+                    blockAction = BlockAction.TARGET_REMOVED_HAS_NO_PROPS;
+                }
+            } else {
+                if (previousBlockProps.hasProperties) {
+                    if (sobe.previousBlockStateInFront.getValue(previousBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue))
+                        blockAction = BlockAction.OTHER_REMOVED_MATCHING_PROPS;
+                    else blockAction = BlockAction.OTHER_REMOVED_PROPS_DONT_MATCH;
+                } else {
+                    blockAction = BlockAction.OTHER_REMOVED_HAS_NO_PROPS;
+                }
+            }
         }
 
         // State changed
-        if (changedBlock == sobe.getPreviousBlockInFront()) {
+        else if (changedBlock == sobe.getPreviousBlockInFront()) {
             if (changedBlock == sobe.targetBlock) blockAction = BlockAction.TARGET_BLOCK_PROP_CHANGE;
             else blockAction = BlockAction.OTHER_BLOCK_PROP_CHANGE;
-
-        } else {  // Block changed
-            if (changedBlock == sobe.targetBlock) blockAction = BlockAction.TARGET_PLACED;
-            else blockAction = BlockAction.OTHER_PLACED;
         }
 
-        sobe.setPreviousBlockStateInFront(level, changedBlockPos);  // Update to new changed blockstate
+        // New block placed, isn't air.
+        else {
+            PropertiesRepresenter changedBlockProps = new PropertiesRepresenter(changedBlock.getStateDefinition().getProperties());
+            if (sobe.hasTargetBlock()) {
+                if (changedBlock == sobe.targetBlock) {
+                    if (changedBlockProps.hasProperties) {
+                        if (changedBlockState.getValue(changedBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue))
+                            blockAction = BlockAction.TARGET_PLACED_MATCHING_PROPERTY;
+                        else blockAction = BlockAction.TARGET_PLACED_PROPS_DONT_MATCH;
+                    } else {
+                        blockAction = BlockAction.TARGET_PLACED_HAS_NO_PROPS;
+                    }
+                } else {
+                    if (changedBlockProps.hasProperties) {
+                        if (changedBlockState.getValue(changedBlockProps.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue))
+                            blockAction = BlockAction.OTHER_PLACED_MATCHING_PROPS;
+                        else blockAction = BlockAction.OTHER_PLACED_PROPS_DONT_MATCH;
+                    } else {
+                        blockAction = BlockAction.OTHER_PLACED_HAS_NO_PROPS;
+                    }
+                }
+            } else {
+
+            }
+        }
+
+        // Update to new changed blockstate if changed.
+        if (changedBlockState != sobe.previousBlockStateInFront) sobe.setPreviousBlockStateInFront(level, changedBlockPos);
         return blockAction;
-    }
+    }*/
 
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
