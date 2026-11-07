@@ -46,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
+import java.util.Properties;
 
 @ParametersAreNonnullByDefault
 public class SmarterObserverBlock extends DirectedDirectionalBlock implements EntityBlock, IBE<SmarterObserverBlockEntity> {
@@ -250,7 +251,7 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
                                 if (sobe.shouldDetectValues()) {
                                     dl("Target block has selected properties and values to filter.");
                                     if (changedBlock == Blocks.AIR && sobe.getPreviousBlockInFront() == sobe.targetBlock) {
-                                        switch (sobe.blockRemovedDetectingPropsBh) {
+                                        switch (sobe.blockRemovedDetectingPropsBehaviour) {
                                             case BRDPBhRepresenter.DETECT_BLOCK_CHANGE -> {
                                                 dl("Changed block is air AND previous is target (removed), no previous props to check, STARTING signal");
                                                 sobe.setPreviousBlockStateInFront(level, changedPos);
@@ -260,7 +261,7 @@ public class SmarterObserverBlock extends DirectedDirectionalBlock implements En
                                             }
                                             case BRDPBhRepresenter.DETECT_ONLY_PROPS -> {
                                                 dl("Changed block is air AND previous is target (removed), now checking previous props");
-                                                SelectionRepresenter sr = new SelectionRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
+                                                PropertiesRepresenter sr = new PropertiesRepresenter(sobe.getPreviousBlockInFront().getStateDefinition().getProperties());
                                                 if (sr.hasProp(sobe.targetProperty) && sr.hasPValue(sobe.targetProperty, sobe.targetValue)) {
                                                     dl("Previous block contains target prop and prop value (doesn't mean it's in the correct state, only that it could have the values!)");
                                                     if (sobe.previousBlockStateInFront.getValue(sr.getProp(sobe.targetProperty)).toString().equals(sobe.targetValue)) {

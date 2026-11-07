@@ -42,7 +42,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
     public String detectMode = DetectModeRepresenter.DETECT_BOTH;  // Used by screen to know (when block placed for the first time) what to put in button icon.
     public Integer onForTicks = 2;  // Should be 1 redstone tick, i think? Used by screen to know (when block placed for the first time) what to put in scroll input.
     public BlockState previousBlockStateInFront = Blocks.AIR.defaultBlockState();
-    public String blockRemovedDetectingPropsBehaviour = BlockRemovedDetectingPropsBehavioursRepresenter.LOCKED_FOR_NO_PROPS;  // Default to this since at first startup no properties are selected, always.
+    public String blockRemovedDetectingPropsBehaviour = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;  // Default to this since at first startup no properties are selected, always.
 
     // Screen settings
     public boolean showOnlyTicks = true;
@@ -84,7 +84,7 @@ public class SmarterObserverBlockEntity extends SmartBlockEntity {
                 targetProperty = PropertiesRepresenter.DONT_DETECT;
                 targetValue = PropertiesRepresenter.DONT_DETECT;
             }
-            blockRemovedDetectingPropsBehaviour = BlockRemovedDetectingPropsBehavioursRepresenter.LOCKED_FOR_NO_PROPS;  // In both cases, the filters aren't set.
+            blockRemovedDetectingPropsBehaviour = BRDPBhRepresenter.LOCKED_FOR_NO_PROPS;  // In both cases, the filters aren't set.
             if (CUCommonConfig.logSmarterObserver()) CUMain.LOGGER.info("Selected filter: {}", Block.byItem(is.getItem()));
             this.setChanged();
         });

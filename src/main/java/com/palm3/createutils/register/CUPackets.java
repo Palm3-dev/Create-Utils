@@ -1,7 +1,6 @@
 package com.palm3.createutils.register;
 
 import com.palm3.createutils.CUMain;
-import com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverPacket;
 import net.createmod.catnip.net.base.BasePacketPayload;
 import net.createmod.catnip.net.base.CatnipPacketRegistry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -12,9 +11,9 @@ import java.util.Locale;
 
 import static com.palm3.createutils.CUMain.modRes;
 
-public enum CUPackets implements BasePacketPayload.PacketTypeProvider {
+public enum CUPackets /*implements BasePacketPayload.PacketTypeProvider*/ {
 
-    SMARTER_OBSERVER_PACKET(SmarterObserverPacket.class, SmarterObserverPacket.STREAM_CODEC);
+    /*SMARTER_OBSERVER_PACKET(SmarterObserverPacket.class, SmarterObserverPacket.STREAM_CODEC);
 
     private final CatnipPacketRegistry.PacketType<?> type;
 
@@ -37,5 +36,5 @@ public enum CUPackets implements BasePacketPayload.PacketTypeProvider {
             packetRegistry.registerPacket(packet.type);
         }
         packetRegistry.registerAllPackets();
-    }
+    }*/
 }

@@ -1,6 +1,5 @@
 package com.palm3.createutils.register;
 
-import com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock;
 import com.simibubi.create.AllItems;
 import com.simibubi.create.foundation.data.SharedProperties;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -19,7 +18,7 @@ import static com.tterrag.registrate.providers.RegistrateRecipeProvider.has;
 
 public class CUBlocks {
 
-    public static final BlockEntry<SmarterObserverBlock> SMARTER_OBSERVER = CU_REGISTRATE
+    /*public static final BlockEntry<SmarterObserverBlock> SMARTER_OBSERVER = CU_REGISTRATE
             .block("smarter_observer", SmarterObserverBlock::new)
             .initialProperties(SharedProperties::stone)
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW))
@@ -28,7 +27,7 @@ public class CUBlocks {
                 ModelFile unpowered = p.models().getExistingFile(modRes("block/smarter_observer/observer_unpowered"));
 
                 p.getVariantBuilder(c.getEntry()).forAllStates(state -> {
-                    Direction hFacing = state.getValue(SmarterObserverBlock.FACING);
+                    Direction hFacing = state.getValue(SmarterObserverBlock.H_FACING);
                     AttachFace target = state.getValue(SmarterObserverBlock.TARGET);
                     ModelFile model = state.getValue(SmarterObserverBlock.POWERED) ? powered : unpowered;
 
@@ -61,7 +60,22 @@ public class CUBlocks {
                     .save(p)
             )
             .build()
-            .register();
+            .register();*/
+
+    //SPEED CONTROLLER FROM CREATE
+    /*
+    public static final BlockEntry<SpeedControllerBlock> ADJUSTABLE_SPEED_CONTROLLER =
+		REGISTRATE.block("rotation_speed_controller", SpeedControllerBlock::new)
+			.initialProperties(SharedProperties::softMetal)
+			.properties(p -> p.mapColor(MapColor.TERRACOTTA_YELLOW))
+			.transform(axeOrPickaxe())
+			.tag(AllBlockTags.SAFE_NBT.tag)
+			.transform(CStress.setNoImpact())
+			.blockstate(BlockStateGen.horizontalAxisBlockProvider(true))
+			.item()
+			.transform(customItemModel())
+			.register();
+     */
 
 
     public static void register() {}

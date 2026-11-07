@@ -25,7 +25,7 @@ public class CUMain {
 
         modContainer.registerConfig(ModConfig.Type.COMMON, CUCommonConfig.COMMON_CONFIG);
 
-        CUPackets.register();
+        //CUPackets.register();
         CUBlocks.register();
         CUBlockEntities.register();
         CUTabs.CU_TABS.register(modEventBus);

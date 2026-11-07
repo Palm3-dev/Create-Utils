@@ -17,7 +17,7 @@ public class CUTabs {
                     .title(Component.translatable("itemGroup.createutils.main_creative_tab"))
                     .icon(() -> new ItemStack(Items.IRON_BLOCK.asItem()))
                     .displayItems((params, output) -> {
-                        CUBlocks.SMARTER_OBSERVER.asItem();
+                        //CUBlocks.SMARTER_OBSERVER.asItem();
                         Items.STICK.asItem();
                     })
                     .build()
