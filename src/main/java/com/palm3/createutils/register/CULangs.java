@@ -8,7 +8,8 @@ public class CULangs {
     }
 
     public static void addLangs() {
-        add("itemGroup.createutils.main_creative_tab", "Create: Utils");
+        // Creative tabs
+        add("itemGroup.create_utils.main_creative_tab", "Create: Utils");
 
         // Smarter Observer
         add("smarter_observer_be.target_block", "Target Block");
@@ -30,5 +31,9 @@ public class CULangs {
         add("gui.smarter_observer.detect_props_only_if_block_changes_tooltip", "Detect the block removal only if the property value matches the targets.");
         add("gui.smarter_observer.detect_block_if_changes_tooltip", "Detect the block removal even if it doesn't have matching property value.");
         add("gui.smarter_observer.locked_for_no_props_tooltip", "Locked for no properties!");
+
+        // Compact Adjustable Speed Controller
+        add("block.create_utils.adjustable_speed_controller_compact.tooltip.summary", "A compact speed controller, going from 0 to the input speed with _redstone power._ Ponder coming soon!");
+        add("block.create_utils.adjustable_speed_controller_compact.output_rotation_direction", "Output Rotation Direction");
     }
 }
