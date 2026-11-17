@@ -40,13 +40,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.checkerframework.checker.units.qual.N;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Collection;
-import java.util.Properties;
 
 @ParametersAreNonnullByDefault
 public class SmarterObserverBlock extends DirectedDirectionalBlock implements EntityBlock, IBE<SmarterObserverBlockEntity> {

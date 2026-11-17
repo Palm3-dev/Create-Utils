@@ -13,18 +13,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SOSettingsRepresenter {
 
     // Used for screen and also block for checking matching props.
-    protected static class PropertiesRepresenter {
+    /*protected static class PropertiesRepresenter {
         public static final String DONT_DETECT = "internal_detect_disabled";
         public static final String CANT_DETECT = "internal_cannot_detect";
         public static final String NOT_SET = "internal_still_not_set";
 
+        // Two reciprocally inverted maps, that contains all the properties (as string) to display by index (and vice versa).
         private final LinkedHashMap<Integer, String> propertiesByIndex = new LinkedHashMap<>();
         private final LinkedHashMap<String, Integer> propsIndexesByProp = new LinkedHashMap<>();
 
+        // Two reciprocally inverted maps, that contains all the values of a property to display (and vice versa), grouped by property as string.
         private final LinkedHashMap<String, LinkedHashMap<Integer, String>> valuesByIndex_ByProp = new LinkedHashMap<>();
         private final LinkedHashMap<String, LinkedHashMap<String, Integer>> valuesIndexesByValue_ByProp = new LinkedHashMap<>();
 
-        private final LinkedHashMap<String, Property<?>> truePropertiesByProp = new LinkedHashMap<>();
+        // All the actual MC properties accessible via the string property.
+        private final LinkedHashMap<String, Property<?>> actualPropertiesByProp = new LinkedHashMap<>();
 
         public final boolean hasProperties;
 
@@ -50,7 +53,7 @@ public class SOSettingsRepresenter {
                 for (Property<?> property : targetBlockProperties) {
                     propertiesByIndex.put(propsIndex, property.getName());
                     propsIndexesByProp.put(property.getName(), propsIndex);
-                    truePropertiesByProp.put(property.getName(), property);
+                    actualPropertiesByProp.put(property.getName(), property);
 
                     LinkedHashMap<Integer, String> valuesByIndex = new LinkedHashMap<>();
                     LinkedHashMap<String, Integer> valuesIndexesByValue = new LinkedHashMap<>();
@@ -148,13 +151,13 @@ public class SOSettingsRepresenter {
         }
 
         public Property<?> getProp(String prop) {
-            if (truePropertiesByProp.get(prop) == null)
+            if (actualPropertiesByProp.get(prop) == null)
                 throw new IllegalArgumentException("The given property [" + prop + "] doesn't exist in LinkedHashMap<String, Property<?>> (properties by property as string)!");
-            return truePropertiesByProp.get(prop);
+            return actualPropertiesByProp.get(prop);
         }
-    }
+    }*/
 
-    protected static class DetectModeRepresenter {
+    /*protected static class DetectModeRepresenter {
         public static final String DETECT_PLACED = "detect_placed";
         public static final String DETECT_REMOVED = "detect_removed";
         public static final String DETECT_BOTH = "detect_both";
@@ -185,13 +188,14 @@ public class SOSettingsRepresenter {
                 default -> throw new IllegalArgumentException("The given detect behaviour [" + currentDetectBehaviour + "] doesn't exist!");
             }
         }
-    }
+    }*/
 
-    protected static class BRDPBhRepresenter {
+    // "BRDPBh" means "block removed (or replaced, idk) detecting properties behaviour"
+    /*protected static class BRDPBhRepresenter {
         // Representer of the behaviour of the observer if a block is removed while detecting the properties & values. Either detect it or skip and detect properties only.
         public static final String DETECT_ONLY_PROPS = "detect_only_props";  // If block changes without having correct properties/values, skip.
         public static final String DETECT_BLOCK_CHANGE = "detect_block_change";  // If block changes without having correct properties/values, detect.
-        public static final String LOCKED_FOR_NO_PROPS = "locked_for_no_props";  // Used if properties don't need to be detected.
+        public static final String LOCKED_FOR_NO_PROPS = "locked_for_no_props";  // Used if properties don't need to be detected.  REMEMBER SYNC WITH PROPERTIES MODE, if has but not set this needs to be also set
 
         public static String getNext(String currentBlockRemovedPropBh) {
             switch (currentBlockRemovedPropBh) {
@@ -218,5 +222,5 @@ public class SOSettingsRepresenter {
                 default -> throw new IllegalArgumentException("The given behaviour [" + currentBlockRemovedPropBh + "] doesn't exist!");
             }
         }
-    }
+    }*/
 }

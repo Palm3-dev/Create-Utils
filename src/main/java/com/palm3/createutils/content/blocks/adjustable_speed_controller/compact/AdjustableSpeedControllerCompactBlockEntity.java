@@ -1,4 +1,4 @@
-package com.palm3.createutils.content.adjustable_speed_controller.compact;
+package com.palm3.createutils.content.blocks.adjustable_speed_controller.compact;
 
 import com.simibubi.create.content.contraptions.bearing.WindmillBearingBlockEntity;
 import com.simibubi.create.content.kinetics.transmission.SplitShaftBlockEntity;
@@ -52,7 +52,7 @@ public class AdjustableSpeedControllerCompactBlockEntity extends SplitShaftBlock
         super.addBehaviours(behaviours);
         outputDirection = new ScrollOptionBehaviour<>(
                 WindmillBearingBlockEntity.RotationDirection.class,
-                Component.translatable("block.create_utils.adjustable_speed_controller_compact.output_rotation_direction"),
+                Component.translatable("block.create_utils.adjustable_speed_controllers.output_rotation_direction"),
                 this,
                 new ValueBoxTransform.Sided() {
                     @Override

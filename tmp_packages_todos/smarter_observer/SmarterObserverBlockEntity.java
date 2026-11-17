@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import org.jetbrains.annotations.NotNull;
 
-import static com.palm3.createutils.content.blocks.smarter_observer.SmarterObserverBlock.dl;
 import static com.palm3.createutils.content.blocks.smarter_observer.SOSettingsRepresenter.PropertiesRepresenter.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;

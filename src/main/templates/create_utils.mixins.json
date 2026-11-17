@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.palm3.createutils.foundation.mixins",
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "create_utils.refmap.json",
+  "mixins": [
+    "FilteringBehaviourMixin",
+    "CreativeMotorBlockEntityMixin",
+    "ValueSettingsClientMixin",
+    "ScrollValueBehaviourMixin"
+  ],
+  "client": [
+
+  ],
+  "minVersion": "0.8"
+}

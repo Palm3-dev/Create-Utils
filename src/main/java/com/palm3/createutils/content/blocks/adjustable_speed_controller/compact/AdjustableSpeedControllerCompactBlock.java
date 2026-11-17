@@ -1,4 +1,4 @@
-package com.palm3.createutils.content.adjustable_speed_controller.compact;
+package com.palm3.createutils.content.blocks.adjustable_speed_controller.compact;
 
 import com.palm3.createutils.register.CUBlockEntities;
 import com.simibubi.create.content.kinetics.base.AbstractEncasedShaftBlock;

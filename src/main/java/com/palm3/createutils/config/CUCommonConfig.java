@@ -12,6 +12,22 @@ public class CUCommonConfig {
     // Smarter Observer
     public static final ModConfigSpec.IntValue MAX_ON_FOR_TICKS;
 
+
+
+    //public static final ModConfigSpec.BooleanValue ENABLE_SPEED_OVERRIDES;
+
+    // Scroll values settings
+    public static final ModConfigSpec.BooleanValue ENABLE_OLD_LIKE_SPEED_SETTINGS;
+    public static final ModConfigSpec.EnumValue<DisableScrollValuesMode> DISABLE_SCROLL_VALUES_MODE;
+
+    public enum DisableScrollValuesMode {
+        ALWAYS,
+        WHEN_SCREWDRIVER,
+        NEVER;
+
+        DisableScrollValuesMode() {}
+    }
+
     static {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
@@ -35,14 +51,26 @@ public class CUCommonConfig {
 
         builder.pop();
 
-        COMMON_CONFIG = builder.build();
-    }
+        //------------ Screwdriver ----------
+        /*builder.push("Screwdriver");
+        ENABLE_SPEED_OVERRIDES = builder
+                .comment("Defines if create speed settings behaviours should be replaced with screwdriver (e.g. no more scroll value).")
+                .define("Enable configs override", true);
 
-    // Logging utils
-    public static boolean logAll() {
-        return LOG_ALL.getAsBoolean();
-    }
-    public static boolean logSmarterObserver() {
-        return LOG_ALL.getAsBoolean() || LOG_SMARTER_OBSERVER.getAsBoolean();
+
+        builder.pop();*/
+
+        //------------ Scroll values settings ----------
+        builder.push("Generators modifications");
+        ENABLE_OLD_LIKE_SPEED_SETTINGS = builder
+                .comment("Enables the old Create speed settings method achieved via mouse scroll on generator blocks. This will be applied to all the blocks implementing Create's KineticScrollValue. Values needs to be modified with Screwdriver item.")
+                .define("Old-Like Speed Settings", true);
+
+        DISABLE_SCROLL_VALUES_MODE = builder
+                .comment("Defines if all the Create native scroll values (KineticScrollValue) on the blocks implementing it should be disabled. Dependant on 'Old-Like Speed Settings' that must be enabled, otherwise this wont do anything!")
+                .defineEnum("Disable scroll values mode", DisableScrollValuesMode.WHEN_SCREWDRIVER);
+        builder.pop();
+
+        COMMON_CONFIG = builder.build();
     }
 }
