@@ -32,13 +32,13 @@ public class CUBlocks {
 			.transform(axeOrPickaxe())
 			.blockstate((c, p) -> {
 				ResourceLocation baseModelLoc = ResourceLocation.fromNamespaceAndPath("create", "block/sequenced_gearshift/idle");
-				String baseTextureName = "block/adjustable_speed_controller/compact/adjustable_speed_controller_compact_";
-				ModelFile model0 = p.models().withExistingParent(c.getName() + "_0", baseModelLoc).texture("4", modRes(baseTextureName + "0"));
-				ModelFile model1 = p.models().withExistingParent(c.getName() + "_1", baseModelLoc).texture("4", modRes(baseTextureName + "1"));
-				ModelFile model2 = p.models().withExistingParent(c.getName() + "_2", baseModelLoc).texture("4", modRes(baseTextureName + "2"));
-				ModelFile model3 = p.models().withExistingParent(c.getName() + "_3", baseModelLoc).texture("4", modRes(baseTextureName + "3"));
-				ModelFile model4 = p.models().withExistingParent(c.getName() + "_4", baseModelLoc).texture("4", modRes(baseTextureName + "4"));
-				ModelFile model5 = p.models().withExistingParent(c.getName() + "_5", baseModelLoc).texture("4", modRes(baseTextureName + "5"));
+				String baseLoc = "block/adjustable_speed_controller/compact/pwr_";
+				ModelFile model0 = p.models().withExistingParent(baseLoc + "0", baseModelLoc).texture("4", modRes(baseLoc + "0"));
+				ModelFile model1 = p.models().withExistingParent(baseLoc + "1", baseModelLoc).texture("4", modRes(baseLoc + "1"));
+				ModelFile model2 = p.models().withExistingParent(baseLoc + "2", baseModelLoc).texture("4", modRes(baseLoc + "2"));
+				ModelFile model3 = p.models().withExistingParent(baseLoc + "3", baseModelLoc).texture("4", modRes(baseLoc + "3"));
+				ModelFile model4 = p.models().withExistingParent(baseLoc + "4", baseModelLoc).texture("4", modRes(baseLoc + "4"));
+				ModelFile model5 = p.models().withExistingParent(baseLoc + "5", baseModelLoc).texture("4", modRes(baseLoc + "5"));
 
 				p.getVariantBuilder(c.getEntry()).forAllStates(state -> {
 					int yRot;
@@ -65,7 +65,7 @@ public class CUBlocks {
 			.item()
 			.model((c, p) ->
 					p.withExistingParent(c.getName(), ResourceLocation.fromNamespaceAndPath("create", "block/sequenced_gearshift/item"))
-							.texture("4", modRes("block/adjustable_speed_controller/compact/adjustable_speed_controller_compact_0"))
+							.texture("4", modRes("block/adjustable_speed_controller/compact/pwr_0"))
 			)
 			.recipe((c, p) -> {
 				ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, c.get())
