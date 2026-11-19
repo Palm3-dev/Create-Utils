@@ -1,10 +1,11 @@
 package com.palm3.createutils.content.items.screwdriver;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.palm3.createutils.foundation.items.IBlockFilterSelectorItem;
+import com.palm3.createutils.foundation.items.IFilterSelector;
+import com.palm3.createutils.foundation.items.ksvb_modifier.IKSVBModifier;
+import com.simibubi.create.foundation.blockEntity.SmartBlockEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -21,9 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
-public class ScrewdriverItem extends Item implements IBlockFilterSelectorItem {
+public class ScrewdriverItem extends Item implements IFilterSelector, IKSVBModifier {
 
-    // Shows selected target block filter
     public static final IItemDecorator DECORATOR = (guiGraphics, font, stack, xOffset, yOffset) -> {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null)
@@ -43,23 +43,20 @@ public class ScrewdriverItem extends Item implements IBlockFilterSelectorItem {
     }
 
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
-        return IBlockFilterSelectorItem.setTargetBlockTo(player, usedHand, Blocks.AIR);
+        return IFilterSelector.setTargetBlockTo(player, usedHand, Blocks.AIR);
     }
 
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
-        // Scroll value settings behaviour
-        Level level = context.getLevel();
-        BlockPos clickedPos = context.getClickedPos();
-        BlockEntity clickedBE = level.getBlockEntity(clickedPos);
-        if (ScrewdriverEvents.trySendUpdatePacket(clickedBE, level))
-            return InteractionResult.SUCCESS;
-
-        // Filter behaviour
         Player player = context.getPlayer();
         if (player == null)
             return InteractionResult.PASS;
 
-        return player.isShiftKeyDown() ? IBlockFilterSelectorItem.setTargetBlockTo(context, Blocks.AIR) : setTargetBlock(context);
+        BlockEntity clickedBE = context.getLevel().getBlockEntity(context.getClickedPos());
+
+        if (clickedBE instanceof SmartBlockEntity sbe && IKSVBModifier.hasBehaviour(sbe))
+            return setTargetBlock(context);  // For compatibility with IKSVBModifier
+
+        return player.isShiftKeyDown() ? IFilterSelector.setTargetBlockTo(context, Blocks.AIR) : setTargetBlock(context);
     }
 }

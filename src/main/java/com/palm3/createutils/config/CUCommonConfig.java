@@ -17,8 +17,8 @@ public class CUCommonConfig {
     //public static final ModConfigSpec.BooleanValue ENABLE_SPEED_OVERRIDES;
 
     // Scroll values settings
-    public static final ModConfigSpec.BooleanValue ENABLE_OLD_LIKE_SPEED_SETTINGS;
-    public static final ModConfigSpec.EnumValue<DisableScrollValuesMode> DISABLE_SCROLL_VALUES_MODE;
+    //public static final ModConfigSpec.BooleanValue ENABLE_OLD_LIKE_SPEED_SETTINGS;
+    //public static final ModConfigSpec.EnumValue<DisableScrollValuesMode> DISABLE_SCROLL_VALUES_MODE;
 
     public enum DisableScrollValuesMode {
         ALWAYS,
@@ -61,7 +61,7 @@ public class CUCommonConfig {
         builder.pop();*/
 
         //------------ Scroll values settings ----------
-        builder.push("Generators modifications");
+        /*builder.push("Generators modifications");
         ENABLE_OLD_LIKE_SPEED_SETTINGS = builder
                 .comment("Enables the old Create speed settings method achieved via mouse scroll on generator blocks. This will be applied to all the blocks implementing Create's KineticScrollValue. Values needs to be modified with Screwdriver item.")
                 .define("Old-Like Speed Settings", true);
@@ -69,7 +69,7 @@ public class CUCommonConfig {
         DISABLE_SCROLL_VALUES_MODE = builder
                 .comment("Defines if all the Create native scroll values (KineticScrollValue) on the blocks implementing it should be disabled. Dependant on 'Old-Like Speed Settings' that must be enabled, otherwise this wont do anything!")
                 .defineEnum("Disable scroll values mode", DisableScrollValuesMode.WHEN_SCREWDRIVER);
-        builder.pop();
+        builder.pop();*/
 
         COMMON_CONFIG = builder.build();
     }

@@ -4,18 +4,12 @@ import com.mojang.logging.LogUtils;
 import com.palm3.createutils.config.CUCommonConfig;
 import com.palm3.createutils.content.items.screwdriver.ScrewdriverItem;
 import com.palm3.createutils.register.*;
-import com.simibubi.create.AllItems;
-import com.simibubi.create.content.equipment.potatoCannon.PotatoCannonItemRenderer;
 import com.simibubi.create.foundation.data.CreateRegistrate;
 import com.simibubi.create.foundation.item.ItemDescription;
 import net.createmod.catnip.lang.FontHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -24,7 +18,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Unique;
 
 @Mod(CUMain.MOD_ID)
 @EventBusSubscriber
@@ -56,22 +49,5 @@ public class CUMain {
     @SubscribeEvent
     public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
         event.register(CUItems.SCREWDRIVER, ScrewdriverItem.DECORATOR);
-    }
-
-    public static boolean shouldDisableScrollValues() {
-        if (!CUCommonConfig.ENABLE_OLD_LIKE_SPEED_SETTINGS.getAsBoolean())
-            return false;
-
-        if (CUCommonConfig.DISABLE_SCROLL_VALUES_MODE.get() == CUCommonConfig.DisableScrollValuesMode.ALWAYS)
-            return true;
-
-        Player player = Minecraft.getInstance().player;
-
-        if (player == null)
-            return false;
-
-        ItemStack stackInHand = player.getItemInHand(player.getUsedItemHand());
-
-        return CUCommonConfig.DISABLE_SCROLL_VALUES_MODE.get() == CUCommonConfig.DisableScrollValuesMode.WHEN_SCREWDRIVER && stackInHand.getItem() instanceof ScrewdriverItem;
     }
 }

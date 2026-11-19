@@ -1,5 +1,6 @@
 package com.palm3.createutils.foundation.items;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -16,12 +17,16 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-// This interfaces allows items to store and select a block (or itemstack) to be used as filter.
+/*  This interfaces allows items to store and select a block intended to be used as filter.
+    Note for IKSVBModifier implementors: if you also implement this, value saves are disabled to allow to this
+    interface to get the target block, otherwise impossible. See also KSVBModifierClientEvents class.
+    Some manual implementation like is still required, see ScrewdriverItem.useOn() for an example.
+ */
 
 @ParametersAreNonnullByDefault
-public interface IBlockFilterSelectorItem {
+public interface IFilterSelector {
 
-    static @NotNull String readTag(ItemStack targetItemStack) {
+    static String readTag(ItemStack targetItemStack) {
         return targetItemStack.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag().getString("TargetedBlock");
     }
 
@@ -42,7 +47,7 @@ public interface IBlockFilterSelectorItem {
         return InteractionResultHolder.success(stackInHand);
     }
 
-    // Sets the targeted Block to clicked one, designed for use in 'useOn()' method.
+    // Sets the targeted Block to clicked one, by default, designed for use in 'useOn()' method.
     default @NotNull InteractionResult setTargetBlock(UseOnContext context) {
         ItemStack stackInHand = context.getItemInHand();
         Block clickedBlock = context.getLevel().getBlockState(context.getClickedPos()).getBlock();
@@ -51,12 +56,15 @@ public interface IBlockFilterSelectorItem {
     }
 
     // Takes ItemStack (that needs to be an instance of this interface) and returns targeted Block.
-    default Block getTargetedBlock(ItemStack stack) {
+    // Throws IllegalArgumentException if item is not instance of this interface.
+    default @NotNull Block getTargetedBlock(ItemStack stack) {
+        if (!(stack.getItem() instanceof IFilterSelector))
+            throw new IllegalArgumentException("Given item '" + BuiltInRegistries.ITEM.getKey(stack.getItem()) + "' does not implement interface. Cannot get target block!");
         return BuiltInRegistries.BLOCK.get(ResourceLocation.parse(readTag(stack)));
     }
 
     // Takes ItemStack (that needs to be an instance of this interface) and returns targeted Block as ItemStack of size 1.
-    default ItemStack getTargetedItemStack(ItemStack stack) {
+    default @NotNull ItemStack getTargetedItemStack(ItemStack stack) {
         return new ItemStack(getTargetedBlock(stack), 1);
     }
 }

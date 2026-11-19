@@ -36,7 +36,7 @@ public class CULangs {
         add("item.create_utils.screwdriver.tooltip.summary", "Multi-purpose tool for in-depth _Create_ configurations.");
         add("item.create_utils.screwdriver.tooltip.condition1", "When used on Blocks");
         add("item.create_utils.screwdriver.tooltip.behaviour1", "Selects the clicked block.");
-        add("item.create_utils.screwdriver.tooltip.condition2", "When used on Filtered Blocks");
+        add("item.create_utils.screwdriver.tooltip.condition2", "When used on Block Filters");
         add("item.create_utils.screwdriver.tooltip.behaviour2", "Sets the _block filter_ to the previously selected one.");
         add("item.create_utils.screwdriver.tooltip.condition3", "When scrolling on generators");
         add("item.create_utils.screwdriver.tooltip.behaviour3", "_Increments_ or _decrements_ the eventual _generator speed._");
