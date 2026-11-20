@@ -23,6 +23,7 @@ public class CULangs {
     public static void addLangs() {
         // TABS - Main tab
         add("itemGroup.create_utils.main_creative_tab", "Create: Utils");
+        add("itemGroup.create_utils.nonexistent_items_tab", "Non-existent Items");
 
         // BLOCKS - All adjustable speed controllers
         add("block.create_utils.adjustable_speed_controllers.output_rotation_direction", "Output Rotation Direction");
@@ -44,6 +45,7 @@ public class CULangs {
         add("item.create_utils.screwdriver.tooltip.behaviour4", "Sets the modified speed value.");
         add("item.create_utils.screwdriver.tooltip.condition5", "When left-clicked on generators");
         add("item.create_utils.screwdriver.tooltip.behaviour5", "Reverses the rotation direction.");
+        add("item.create_utils.screwdriver.normal_tooltip.targeted_block", "Target:");
 
 
 

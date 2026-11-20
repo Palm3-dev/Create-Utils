@@ -65,6 +65,7 @@ public interface IFilterSelector {
 
     // Takes ItemStack (that needs to be an instance of this interface) and returns targeted Block as ItemStack of size 1.
     default @NotNull ItemStack getTargetedItemStack(ItemStack stack) {
-        return new ItemStack(getTargetedBlock(stack), 1);
+        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(getTargetedBlock(stack));
+        return new ItemStack(BuiltInRegistries.ITEM.get(blockId), 1);
     }
 }
