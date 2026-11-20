@@ -1,7 +1,7 @@
 package com.palm3.createutils.foundation.items;
 
 import com.mojang.logging.LogUtils;
-import com.simibubi.create.AllBlocks;
+import com.palm3.createutils.CUMain;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -26,8 +26,8 @@ import java.util.List;
     Registers items for any block that doesn't have any in order to be used as filters.
  */
 
-@EventBusSubscriber
-public final class NonexistentItemsRegisterer {
+@EventBusSubscriber(modid = CUMain.MOD_ID)
+public class NonexistentItemsRegisterer {
 
     private static final List<ResourceLocation> BLOCKS_WITH_REGISTERED_ITEMS = new ArrayList<>();
     private static final List<ResourceLocation> BLOCKS_EXCLUSIONS = List.of(

@@ -1,5 +1,6 @@
 package com.palm3.createutils.foundation.items.ksvb_modifier;
 
+import com.palm3.createutils.CUMain;
 import com.simibubi.create.content.kinetics.motor.KineticScrollValueBehaviour;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -18,7 +19,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
     NOTE: value saves are disabled when player is shifting, to allow compatibility with IFilterSelector.
  */
 
-@EventBusSubscriber(Dist.CLIENT)
+@EventBusSubscriber(value = Dist.CLIENT, modid = CUMain.MOD_ID)
 public class KSVBModifierClientEvents {
 
     @SubscribeEvent
